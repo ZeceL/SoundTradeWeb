@@ -1,0 +1,165 @@
+﻿@model IEnumerable<SoundTradeWebApp.Models.Track>
+@{
+    ViewData["Title"] = "Каталог";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="catalog-page-content">
+
+    <button id="toggleContent">Переключить на тексты песен</button>
+    <div class="filter-controls">
+        <label for="genre">Жанр:</label>
+        <select id="genre">
+            <option value="all">Все</option>
+            <option value="pop">Поп</option>
+            <option value="rock">Рок</option>
+            <option value="hiphop">Хип-хоп</option>
+        </select>
+
+        <label for="vocal">Вокал:</label>
+        <select id="vocal">
+            <option value="all">Все</option>
+            <option value="male">Мужской</option>
+            <option value="female">Женский</option>
+            <option value="universal">Универсальный</option>
+        </select>
+        <button id="applyFilters">Применить фильтры</button>
+    </div>
+
+    @* --- Список Песен --- *@
+    <div class="song-list">
+        @if (!Model.Any())
+        {
+            <p style="color: #ccc;">В каталоге пока нет треков.</p>
+        }
+        else
+        {
+            @foreach (var track in Model) @* Цикл по модели *@
+            {
+                <div class="song-item" data-track-id="@track.Id">
+                    <h3>@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p>@Html.DisplayFor(modelItem => track.ArtistName)</p> @* <--- Используется ArtistName *@
+                    <p style="font-size: 0.9em; color: #aaa;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                        @if (!string.IsNullOrEmpty(track.VocalType))
+                        {
+                            <span>Вокал: @track.VocalType</span>
+                        }
+                        @* Добавьте отображение Mood, если нужно *@
+                    </p>
+                    <button class="play-song-btn" data-song-url="@Url.Action("GetAudio", "Tracks", new { id = track.Id })">Слушать</button>
+                    <button class="buy-btn" data-song-id="@track.Id">Купить</button>
+                </div>
+            }
+        }
+    </div>
+
+     @* --- Список Текстов (скрыт по умолчанию) --- *@
+    <div class="lyrics-list" style="display: none;">
+         @if (!Model.Any(t => !string.IsNullOrEmpty(t.Lyrics)))
+         {
+            <p style="color: #ccc;">Тексты песен отсутствуют.</p>
+         }
+         else
+         {
+             @foreach (var track in Model.Where(t => !string.IsNullOrEmpty(t.Lyrics)))
+             {
+                 <div class="lyrics-item">
+                     <h2>@Html.DisplayFor(modelItem => track.Title) (@Html.DisplayFor(modelItem => track.ArtistName))</h2>
+                     @* Используем <pre> для сохранения форматирования текста *@
+                     <pre style="white-space: pre-wrap; color: #bbb; text-align: left; max-height: 400px; overflow-y: auto; background-color: rgba(0,0,0,0.1); padding: 10px; border-radius: 4px;">@Html.DisplayFor(modelItem => track.Lyrics)</pre>
+                 </div>
+             }
+         }
+    </div>
+</div>
+
+@* Секция скриптов для каталога (важно для кнопки play) *@
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Обработчик для кнопки "Слушать" ---
+            const playButtons = document.querySelectorAll('.play-song-btn');
+            const audioPlayer = document.getElementById('audio'); // Плеер из footer
+            const songTitleElement = document.getElementById('song-title');
+            const songArtistElement = document.getElementById('song-artist');
+            const playPauseFooterButton = document.getElementById('playPause');
+
+            if (audioPlayer && songTitleElement && songArtistElement && playPauseFooterButton) {
+                playButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const songUrl = this.getAttribute('data-song-url'); // Получаем URL вида /Tracks/GetAudio/5
+                        const songItem = this.closest('.song-item');
+                        const title = songItem.querySelector('h3').textContent;
+                        const artist = songItem.querySelector('p:first-of-type').textContent;
+
+                        if (songUrl) {
+                            console.log("Playing:", songUrl); // Логируем URL для отладки
+                            audioPlayer.src = songUrl; // Устанавливаем путь к действию контроллера
+                            songTitleElement.textContent = title;
+                            songArtistElement.textContent = artist;
+
+                            // Попытка воспроизведения
+                            var playPromise = audioPlayer.play();
+                            if (playPromise !== undefined) {
+                                playPromise.then(_ => {
+                                    playPauseFooterButton.textContent = '❚❚'; // Пауза
+                                    // Инициализируем AudioContext, если он еще не был создан (функция из script.js)
+                                    if (typeof initAudioContextIfNeeded === "function") {
+                                        initAudioContextIfNeeded();
+                                    }
+                                }).catch(error => {
+                                    console.error("Ошибка воспроизведения:", error);
+                                    playPauseFooterButton.textContent = '▶'; // Возвращаем Play, если ошибка
+                                    // Можно показать сообщение пользователю
+                                });
+                            } else {
+                                 playPauseFooterButton.textContent = '❚❚';
+                                 if (typeof initAudioContextIfNeeded === "function") initAudioContextIfNeeded();
+                            }
+                        } else {
+                            console.error('URL песни не найден для кнопки:', this);
+                        }
+                    });
+                });
+            } else {
+                console.error('Ошибка: Элементы аудиоплеера в footer не найдены.');
+            }
+
+            // --- Код для переключения Песни/Тексты (toggleContent) ---
+            const toggleButton = document.getElementById('toggleContent');
+            const songList = document.querySelector('.catalog-page-content .song-list');
+            const lyricsList = document.querySelector('.catalog-page-content .lyrics-list');
+            const filterControls = document.querySelector('.catalog-page-content .filter-controls');
+
+            if (toggleButton && songList && lyricsList && filterControls) {
+                toggleButton.addEventListener('click', function () {
+                    const isLyricsVisible = lyricsList.style.display !== 'none';
+                    if (isLyricsVisible) {
+                        lyricsList.style.display = 'none';
+                        songList.style.display = 'flex';
+                        filterControls.style.display = 'flex';
+                        toggleButton.textContent = 'Переключить на тексты песен';
+                    } else {
+                        lyricsList.style.display = 'flex';
+                        songList.style.display = 'none';
+                        filterControls.style.display = 'none';
+                        toggleButton.textContent = 'Переключить на список песен';
+                    }
+                });
+            }
+
+            // --- Код для фильтров (заглушка) ---
+            const applyFiltersButton = document.getElementById('applyFilters');
+             if (applyFiltersButton) { applyFiltersButton.addEventListener('click', function() { alert('Фильтрация еще не реализована.'); }); }
+
+            // --- Код для кнопки Купить (заглушка) ---
+             const buyButtons = document.querySelectorAll('.buy-btn');
+             buyButtons.forEach(button => { button.addEventListener('click', function() { alert(`Покупка трека ${this.dataset.songId} еще не реализована.`); }); });
+
+        }); // Конец DOMContentLoaded
+    </script>
+}

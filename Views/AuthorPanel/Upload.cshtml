@@ -1,0 +1,68 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.UploadTrackViewModel
+@{
+    ViewData["Title"] = "Загрузка нового трека";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-form-container">
+
+    <h2 style="color: #eee; text-align: center; margin-bottom: 25px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+    <form asp-action="Upload" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control" placeholder="Введите название" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        @* Поле ArtistName удалено *@
+
+        <div class="form-group mb-3">
+            <label asp-for="Genre" class="control-label"></label>
+            @* Используем select и Tag Helper asp-items для привязки к списку из модели *@
+            <select asp-for="Genre" asp-items="@Model.AvailableGenres" class="form-control">
+                @* Пустой элемент <option> будет выбран, если в модели Genre == null или "" *@
+            </select>
+            <span asp-validation-for="Genre" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="VocalType" class="control-label"></label>
+            <select asp-for="VocalType" asp-items="@Model.AvailableVocalTypes" class="form-control"></select>
+            <span asp-validation-for="VocalType" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Mood" class="control-label"></label>
+            <select asp-for="Mood" asp-items="@Model.AvailableMoods" class="form-control"></select>
+            <span asp-validation-for="Mood" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Lyrics" class="control-label"></label>
+            <textarea asp-for="Lyrics" class="form-control" rows="5" placeholder="Введите текст песни здесь..."></textarea>
+            <span asp-validation-for="Lyrics" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="AudioFile" class="control-label"></label>
+            <input asp-for="AudioFile" type="file" class="form-control" accept="audio/*" />
+            <span asp-validation-for="AudioFile" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-4 d-grid gap-2 d-sm-flex justify-content-sm-end">
+            <a asp-action="Index" class="btn btn-secondary" style="background-color: #6c757d; border-color: #6c757d;">Отмена</a>
+            <button type="submit" class="btn btn-primary">Загрузить трек</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

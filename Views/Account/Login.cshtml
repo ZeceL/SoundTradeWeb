@@ -1,0 +1,60 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Вход";
+}
+<div class="account-form-container"> 
+    <h2>@ViewData["Title"]</h2>
+
+    @* Отображение сообщения об успешной регистрации, если оно есть (из TempData) *@
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            @* Используем классы Bootstrap для разметки (можно заменить на свои) *@
+            <form asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                @Html.AntiForgeryToken() @* CSRF Token *@
+
+                <h4>Введите данные для входа.</h4>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div> @* Ошибки уровня модели *@
+
+                <div class="form-group mb-3">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" placeholder="Введите логин" />
+                    <span asp-validation-for="Username" class="text-danger"></span> @* Ошибка для поля Username *@
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" placeholder="Введите пароль" />
+                    <span asp-validation-for="Password" class="text-danger"></span> @* Ошибка для поля Password *@
+                </div>
+                <div class="form-group form-check mb-3">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="RememberMe" /> @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Войти</button> @* Класс Bootstrap *@
+                </div>
+                <p class="mt-3">
+                    @* Класс Bootstrap *@
+                    <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Зарегистрироваться как новый пользователь?</a>
+                </p>
+                @* <p> <a asp-action="ForgotPassword">Забыли пароль?</a> </p> *@
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @* Подключение стандартных скриптов валидации ASP.NET Core (требуют jQuery) *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

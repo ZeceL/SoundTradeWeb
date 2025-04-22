@@ -1,0 +1,722 @@
+/* Общие стили */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	font-family: Arial, sans-serif;
+	overflow-x: hidden;
+	background-color: #1a1a1a;
+	color: #ccc;
+	padding-bottom: 70px; /* Пример высоты футера */
+}
+
+/* Стили для Header */
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #222; /* Ваш темный фон хедера */
+	color: white;
+	padding: 15px 25px;
+	height: 70px;
+	font-size: 1.1em;
+}
+
+.logo {
+	color: white;
+	font-size: 1.7em;
+	font-weight: bold;
+	text-decoration: none; /* убирает подчеркивание */
+}
+
+	.logo:hover,
+	.logo:active {
+		color: #eee; /* Немного осветлим при наведении */
+		text-decoration: none;
+	}
+
+nav ul {
+	list-style: none;
+	display: flex;
+	margin-bottom: 0; /* Убираем стандартный отступ Bootstrap для списков */
+	padding-left: 0; /* Убираем стандартный отступ Bootstrap */
+}
+
+	nav ul li {
+		margin: 0 15px;
+	}
+
+		nav ul li a {
+			color: white;
+			text-decoration: none;
+			font-size: 1.1em;
+			transition: color 0.2s ease; /* Плавный переход цвета */
+		}
+
+			nav ul li a:hover {
+				color: #4CAF50; /* Цвет при наведении (пример) */
+				text-decoration: none;
+			}
+
+.auth-buttons button, /* Стили для исходных кнопок, если остались где-то */
+.auth-buttons .auth-button-link, /* Стили для ссылок, которые выглядят как кнопки */
+.logout-button /* Стили для кнопки выхода */ {
+	padding: 10px 18px;
+	border: none;
+	cursor: pointer;
+	font-size: 1.1em;
+	border-radius: 5px;
+	text-decoration: none; /* Для ссылок */
+	display: inline-block; /* Для ссылок */
+	text-align: center;
+	vertical-align: middle;
+	transition: background 0.3s ease-in-out, transform 0.1s ease; /* Анимация */
+}
+
+/* Пример разных стилей для кнопок входа/регистрации/выхода (как в _Layout.cshtml) */
+.auth-buttons a[asp-action="Login"] {
+	background-color: #4CAF50; /* Зеленый */
+	color: white;
+}
+
+.auth-buttons a[asp-action="Register"] {
+	background-color: #007BFF; /* Синий */
+	color: white;
+}
+
+.logout-button {
+	background: #555; /* Серый */
+	color: white;
+}
+
+	.auth-buttons button:hover,
+	.auth-buttons .auth-button-link:hover,
+	.logout-button:hover {
+		/* background: #555; */ /* Можно добавить изменение фона при наведении */
+		filter: brightness(1.1); /* Слегка осветляем */
+		transform: scale(1.03); /* Небольшое увеличение */
+	}
+
+	.auth-buttons button:active,
+	.auth-buttons .auth-button-link:active,
+	.logout-button:active {
+		transform: scale(0.98); /* Небольшое уменьшение при клике */
+	}
+
+/* Стили для Main (основное содержимое) */
+main {
+	flex: 1; /* Занимает все доступное пространство между header и footer */
+	padding: 20px;
+	background-color: #1a1a1a; /* Фон для основной части */
+}
+
+/* Стили для секций песен на главной */
+.song-section {
+	margin-bottom: 30px;
+}
+
+	.song-section h2 {
+		color: #eee;
+		border-bottom: 2px solid #4CAF50; /* Пример акцентного цвета */
+		padding-bottom: 5px;
+		margin-bottom: 15px;
+	}
+
+	.song-section ul.song-list { /* Уточняем селектор для главной */
+		list-style: none;
+		padding-left: 0;
+	}
+
+		.song-section ul.song-list li {
+			background: #282828; /* Фон элемента списка */
+			color: #ccc;
+			padding: 10px 15px;
+			margin-bottom: 8px;
+			border-radius: 4px;
+			transition: background-color 0.2s;
+		}
+
+			.song-section ul.song-list li:hover {
+				background-color: #333;
+			}
+
+
+/* Стили для Footer и Плеера */
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1000;
+	background: #111;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	margin: 0;
+	height: 70px; /* Пример высоты футера */
+}
+/* Добавляем стили для обертки плеера */
+.player-wrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%; /* Занимает всю высоту футера */
+	display: flex;
+	justify-content: center; /* Центрирование по горизонтали */
+	align-items: center; /* Центрирование по вертикали */
+	margin: 0;
+	padding: 0;
+}
+
+.custom-audio-player {
+	display: flex;
+	align-items: center;
+	padding: 10px 20px;
+	background: rgba(28, 28, 28, 0.8);
+	border-radius: 10px;
+	width: 80%;
+	max-width: 600px;
+	height: 100%; /* Плеер занимает всю высоту player-wrapper */
+	margin: 0;
+}
+
+/* Корректируем отступы элементов внутри плеера, так как justify-content: space-between убран */
+.song-info {
+	display: flex;
+	align-items: center;
+	margin-right: 20px; /* Отступ справа */
+}
+
+#playPause {
+	margin: 0 15px;
+}
+
+.progress-bar {
+	flex-grow: 1;
+	margin: 0 15px;
+}
+
+.volume-container {
+	margin-left: 15px; /* Отступ слева */
+}
+
+/* Остальные стили для .equalizer, .custom-audio-player и т.д. остаются без изменений */
+.equalizer {
+	width: 100%;
+	height: 100%; /* Эквалайзер занимает всю высоту футера */
+	background: #181818;
+	margin: 0;
+	padding: 0;
+}
+
+#equalizerCanvas {
+	display: block;
+	width: 100%;
+	height: 100%; /* Занимает всю высоту div.equalizer */
+}
+
+.custom-audio-player {
+	display: flex;
+	align-items: center;
+	/* justify-content: space-between; */ /* Убираем или меняем, т.к. размеры будут управляться flex свойствами */
+	gap: 15px; /* Пространство между элементами */
+	padding: 10px 15px; /* Немного уменьшим боковые отступы */
+	background: #1c1c1c;
+	width: 100%; /* Плеер на всю ширину footer */
+	box-sizing: border-box; /* Учитываем padding в ширине */
+}
+
+.song-info {
+	display: flex;
+	align-items: center;
+	/* --- Управление шириной блока с информацией --- */
+	flex-shrink: 0; /* Запрещаем блоку сжиматься */
+	flex-grow: 0; /* Запрещаем блоку растягиваться */
+	max-width: 200px; /* ЗАДАЕМ МАКСИМАЛЬНУЮ ШИРИНУ (подберите значение!) */
+	min-width: 120px; /* Опционально: минимальная ширина */
+	overflow: hidden; /* Скрываем все, что не помещается */
+}
+
+	.song-info img#song-cover {
+		width: 50px;
+		height: 50px;
+		margin-right: 10px; /* Уменьшим отступ */
+		border-radius: 4px;
+		object-fit: cover;
+		background-color: #333;
+		flex-shrink: 0; /* Картинка не должна сжиматься */
+	}
+
+	/* Контейнер для текста Название/Исполнитель */
+	.song-info div {
+		overflow: hidden; /* Важно для text-overflow */
+		white-space: nowrap; /* Важно для text-overflow */
+	}
+
+	.song-info p {
+		margin: 0;
+		font-size: 0.9em;
+	}
+
+#song-title,
+#song-artist {
+	margin: 0;
+	padding: 0; /* Убираем лишние отступы у параграфов */
+	line-height: 1.3; /* Можно немного уменьшить межстрочный интервал */
+	/* --- Стили для обрезки текста --- */
+	white-space: nowrap; /* Запрещаем перенос текста */
+	overflow: hidden; /* Скрываем текст, который не помещается */
+	text-overflow: ellipsis; /* Добавляем многоточие (...) */
+	cursor: default; /* Стандартный курсор */
+}
+
+#song-title {
+	font-weight: bold;
+	color: #eee;
+	font-size: 0.95em; /* Можно чуть уменьшить */
+}
+
+#song-artist {
+	color: #aaa;
+	font-size: 0.85em; /* Можно чуть уменьшить */
+}
+
+#playPause {
+	background: none;
+	border: 2px solid #4CAF50;
+	color: #4CAF50;
+	font-size: 1.8em;
+	cursor: pointer;
+	border-radius: 50%;
+	width: 45px;
+	height: 45px;
+	line-height: 40px;
+	text-align: center;
+	padding: 0;
+	flex-shrink: 0; /* Кнопка не должна сжиматься */
+	/* margin: 0 15px; */ /* Используем gap в родителе */
+	transition: background-color 0.2s, color 0.2s;
+}
+
+	#playPause:hover {
+		background-color: #4CAF50;
+		color: white;
+	}
+
+.progress-bar {
+	/* --- Управление шириной прогресс-бара --- */
+	flex-grow: 1; /* Разрешаем растягиваться, занимая свободное место */
+	flex-shrink: 1; /* Разрешаем сжиматься, если нужно */
+	min-width: 100px; /* ЗАДАЕМ МИНИМАЛЬНУЮ ШИРИНУ (подберите значение!) */
+	height: 8px;
+	background: #444;
+	border-radius: 4px;
+	cursor: pointer;
+	overflow: hidden;
+	position: relative;
+	/* margin: 0 15px; */ /* Используем gap в родителе */
+}
+
+.progress {
+	height: 100%;
+	width: 0%;
+	background: linear-gradient(90deg, #4caf50, #81c784);
+	border-radius: 4px;
+	transition: width 0.1s linear;
+}
+
+.volume-container {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0; /* Не сжимаем блок громкости */
+}
+
+	.volume-container img#volume-icon {
+		width: 20px;
+		height: 20px;
+		margin-right: 8px;
+		cursor: pointer; /* Можно добавить Mute по клику */
+	}
+
+input[type='range'].volume-control {
+	-webkit-appearance: none; /* Убираем стандартный вид */
+	appearance: none;
+	width: 100px; /* Ширина слайдера */
+	height: 6px;
+	background: #555; /* Фон слайдера */
+	border-radius: 3px;
+	cursor: pointer;
+	outline: none;
+}
+	/* Стили для ползунка (Chrome, Edge, Safari) */
+	input[type='range'].volume-control::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 14px;
+		height: 14px;
+		background: #4CAF50; /* Цвет ползунка */
+		border-radius: 50%;
+		cursor: pointer;
+	}
+	/* Стили для ползунка (Firefox) */
+	input[type='range'].volume-control::-moz-range-thumb {
+		width: 14px;
+		height: 14px;
+		background: #4CAF50;
+		border-radius: 50%;
+		cursor: pointer;
+		border: none; /* Убрать границу в Firefox */
+	}
+
+
+/* --- Стили для страницы каталога --- */
+/* Класс для body или обертки на странице каталога */
+.catalog-page-content { /* Используем этот класс вместо .catalog-page для конкретного контента */
+	padding: 20px;
+}
+
+	.catalog-page-content #toggleContent { /* Кнопка переключения */
+		display: block; /* Чтобы занимала всю ширину */
+		width: fit-content; /* Или задать ширину */
+		margin: 0 auto 25px auto; /* Центрируем и добавляем отступ снизу */
+		padding: 10px 20px;
+		background: #007BFF; /* Синий */
+		color: white;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		font-size: 1em;
+		transition: background-color 0.2s;
+	}
+
+		.catalog-page-content #toggleContent:hover {
+			background-color: #0056b3;
+		}
+
+
+	.catalog-page-content .filter-controls {
+		display: flex;
+		justify-content: center; /* Центрируем фильтры */
+		align-items: center;
+		gap: 15px; /* Пространство между элементами */
+		margin-bottom: 30px;
+		padding: 15px;
+		background: #252525; /* Фон для панели фильтров */
+		border-radius: 8px;
+		flex-wrap: wrap; /* Перенос на новую строку, если не помещаются */
+	}
+
+		.catalog-page-content .filter-controls label {
+			color: #eee;
+			margin-right: 5px;
+		}
+
+		.catalog-page-content .filter-controls select,
+		.catalog-page-content .filter-controls button {
+			padding: 8px 12px;
+			border-radius: 5px;
+			border: 1px solid #555;
+			font-size: 0.95em;
+			cursor: pointer;
+			background: #333; /* Темный фон для select и button */
+			color: white;
+		}
+
+		.catalog-page-content .filter-controls select {
+			/* Стили для select */
+		}
+
+		.catalog-page-content .filter-controls button#applyFilters { /* Кнопка Применить */
+			background: linear-gradient(45deg, #ff416c, #ff4b2b); /* Градиент */
+			color: white;
+			border: none;
+			transition: transform 0.2s;
+		}
+
+			.catalog-page-content .filter-controls button#applyFilters:hover {
+				transform: scale(1.05);
+			}
+
+	/* Списки песен и текстов в каталоге */
+	.catalog-page-content .song-list,
+	.catalog-page-content .lyrics-list {
+		display: flex; /* Используем flex для элементов списка */
+		flex-direction: column; /* Элементы идут друг под другом */
+		align-items: center; /* Центрируем элементы по горизонтали */
+		gap: 20px; /* Пространство между элементами */
+		margin-top: 20px;
+	}
+
+	.catalog-page-content .song-item,
+	.catalog-page-content .lyrics-item {
+		background: #222;
+		color: #ccc;
+		padding: 20px;
+		width: 80%; /* Ширина элемента списка */
+		max-width: 700px; /* Максимальная ширина */
+		border-radius: 10px;
+		text-align: center;
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+
+		.catalog-page-content .song-item:hover {
+			transform: translateY(-5px); /* Небольшой подъем при наведении */
+			box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.4);
+		}
+
+		.catalog-page-content .song-item h3,
+		.catalog-page-content .lyrics-item h2 {
+			color: #eee;
+			margin-bottom: 10px;
+		}
+
+		.catalog-page-content .song-item p {
+			margin-bottom: 10px;
+			color: #aaa;
+		}
+
+		.catalog-page-content .lyrics-item p {
+			color: #bbb;
+			white-space: pre-wrap; /* Сохраняем переносы строк в тексте */
+			text-align: left; /* Выравнивание текста по левому краю */
+			max-height: 300px; /* Ограничение высоты для длинных текстов */
+			overflow-y: auto; /* Добавление скролла, если текст не помещается */
+		}
+
+		/* Кнопки внутри song-item */
+		.catalog-page-content .song-item button {
+			padding: 8px 15px;
+			margin: 5px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 0.9em;
+			transition: background-color 0.2s, transform 0.1s;
+		}
+
+			.catalog-page-content .song-item button.play-song-btn {
+				background-color: #4CAF50; /* Зеленый для "Слушать" */
+				color: white;
+			}
+
+			.catalog-page-content .song-item button.buy-btn {
+				background-color: #007BFF; /* Синий для "Купить" */
+				color: white;
+			}
+
+			.catalog-page-content .song-item button:hover {
+				filter: brightness(1.1);
+				transform: scale(1.05);
+			}
+
+			.catalog-page-content .song-item button:active {
+				transform: scale(0.95);
+			}
+
+/* ========================================== */
+/* Стили для страниц Входа и Регистрации    */
+/* ========================================== */
+
+/* Общий контейнер для формы */
+.account-form-container {
+	max-width: 550px; /* Максимальная ширина контейнера формы */
+	margin: 40px auto; /* Отступы сверху/снизу и авто по бокам для центрирования */
+	padding: 30px 40px; /* Внутренние отступы */
+	background-color: #282828; /* Темный фон контейнера (как у элементов списка на главной) */
+	border-radius: 8px; /* Скругление углов */
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Тень для объема */
+	border: 1px solid #444; /* Тонкая рамка */
+}
+
+	/* Заголовок формы (h2) */
+	.account-form-container h2 {
+		color: #eee; /* Светлый цвет заголовка */
+		text-align: center; /* Центрирование */
+		margin-bottom: 25px; /* Отступ снизу */
+		font-weight: bold;
+	}
+
+	/* Подзаголовок (h4) */
+	.account-form-container h4 {
+		color: #bbb;
+		text-align: center;
+		margin-bottom: 10px;
+		font-weight: normal;
+		font-size: 1.1em;
+	}
+
+	/* Горизонтальная линия (hr) */
+	.account-form-container hr {
+		border-color: #444; /* Цвет линии */
+		margin-bottom: 25px;
+	}
+
+	/* Группа формы (Bootstrap .form-group или просто div с отступом) */
+	.account-form-container .form-group,
+	.account-form-container .mb-3 /* Поддержка стандартных отступов Bootstrap */ {
+		margin-bottom: 20px; /* Увеличим отступ между полями */
+	}
+
+	/* Метки (label) */
+	.account-form-container label {
+		color: #ccc; /* Светлый цвет метки */
+		margin-bottom: 8px; /* Отступ снизу */
+		font-weight: bold; /* Полужирный шрифт */
+		display: block; /* Метка над полем */
+	}
+
+	/* Поля ввода (input), select */
+	.account-form-container .form-control {
+		display: block; /* Убедимся, что элемент блочный */
+		width: 100%; /* Занимает всю доступную ширину */
+		visibility: visible; /* Явно видимый */
+		opacity: 1; /* Явно непрозрачный */
+		height: auto; /* Автоматическая высота */
+		background-color: #333; /* Темный фон поля */
+		border: 1px solid #555; /* Рамка поля */
+		color: #eee !important; /* СВЕТЛЫЙ цвет вводимого текста (ВАЖНО: добавлен !important для теста) */
+		border-radius: 4px;
+		padding: 10px 12px;
+		margin-bottom: 0; /* Убираем лишний нижний отступ у самого инпута, если он был */
+		transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+
+		.account-form-container .form-control:focus {
+			background-color: #404040;
+			border-color: #4CAF50;
+			color: #fff !important; /* Белый текст при фокусе (ВАЖНО: добавлен !important для теста) */
+			box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+			outline: none;
+		}
+		/* Стиль плейсхолдера */
+		.account-form-container .form-control::placeholder {
+			color: #888;
+			opacity: 1;
+		}
+	/* Дополнительно: Убедимся, что группа формы видима */
+	.account-form-container .form-group,
+	.account-form-container .mb-3 {
+		display: block; /* Или другой нужный display */
+		visibility: visible;
+		opacity: 1;
+		margin-bottom: 20px; /* Восстанавливаем отступ */
+	}
+	/* Стили для radio и checkbox */
+	.account-form-container .form-check-label {
+		color: #ccc; /* Цвет текста метки */
+		font-weight: normal; /* Обычный шрифт */
+	}
+
+	.account-form-container .form-check-input {
+		background-color: #555; /* Фон для чекбокса/радио */
+		border: 1px solid #777; /* Рамка */
+		cursor: pointer;
+		transform: scale(1.2); /* Увеличение размера (подберите значение) */
+	}
+
+		.account-form-container .form-check-input:focus {
+			border-color: #4CAF50;
+			box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+			outline: none;
+		}
+
+		.account-form-container .form-check-input:checked {
+			background-color: #4CAF50; /* Цвет при выборе */
+			border-color: #4CAF50;
+		}
+			/* Стиль "галочки" или точки */
+			.account-form-container .form-check-input:checked[type=checkbox] {
+				background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e"); /* Белая галочка */
+			}
+
+			.account-form-container .form-check-input:checked[type=radio] {
+				background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e"); /* Белая точка */
+			}
+
+	.account-form-container .form-group div { /* Стили для контейнера радиокнопок */
+		display: flex; /* Используем Flexbox */
+		align-items: baseline; /* Выравнивание по вертикали */
+	}
+
+	.account-form-container .form-check-input {
+		margin-right: 5px; /* Отступ справа от радиокнопки */
+	}
+
+	.account-form-container .form-check-label {
+		margin-right: 15px; /* Отступ справа от метки */
+		display: inline-block; /* Или inline-block */
+	}
+
+	/* Кнопка отправки формы (переопределяем .btn-primary внутри контейнера) */
+	.account-form-container .btn-primary {
+		background-color: #4CAF50; /* Зеленый фон (акцентный) */
+		border-color: #4CAF50; /* Зеленая рамка */
+		color: white; /* Белый текст */
+		padding: 12px 20px; /* Увеличенные отступы */
+		font-size: 1.1em; /* Крупнее шрифт */
+		font-weight: bold;
+		width: 100%; /* Кнопка на всю ширину контейнера */
+		margin-top: 15px; /* Отступ сверху */
+		border-radius: 5px;
+		transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+	}
+
+		.account-form-container .btn-primary:hover {
+			background-color: #45a049; /* Чуть темнее при наведении */
+			border-color: #45a049;
+			filter: brightness(1.1);
+		}
+
+		.account-form-container .btn-primary:active {
+			transform: scale(0.98); /* Эффект нажатия */
+		}
+
+	/* Ссылки под формой (Регистрация, Войти, Забыли пароль?) */
+	.account-form-container p { /* Стиль для параграфов со ссылками */
+		text-align: center;
+		margin-top: 20px;
+	}
+
+		.account-form-container p a {
+			color: #4CAF50; /* Зеленый цвет ссылки */
+			text-decoration: none; /* Без подчеркивания */
+			transition: color 0.2s;
+		}
+
+			.account-form-container p a:hover {
+				color: #81c784; /* Светлее при наведении */
+				text-decoration: underline; /* Подчеркивание при наведении */
+			}
+
+	/* Сообщения об ошибках валидации */
+	.account-form-container .text-danger,
+	.account-form-container .validation-summary-errors ul { /* Для summary тоже */
+		color: #ff8a8a !important; /* Светло-красный цвет для ошибок (важно для переопределения Bootstrap) */
+		font-size: 0.9em; /* Чуть меньше шрифт */
+		list-style: none; /* Убрать маркеры у списка summary */
+		padding-left: 0; /* Убрать отступ у списка summary */
+	}
+
+	.account-form-container .validation-summary-errors {
+		margin-bottom: 15px;
+	}
+
+	/* Сообщение об успешной регистрации (на странице Login) */
+	.account-form-container .alert-success {
+		background-color: rgba(76, 175, 80, 0.15); /* Полупрозрачный зеленый фон */
+		color: #a5d6a7; /* Светло-зеленый текст */
+		border: 1px solid rgba(76, 175, 80, 0.3); /* Полупрозрачная зеленая рамка */
+		border-radius: 4px;
+		padding: 15px;
+		margin-bottom: 20px;
+		text-align: center;
+	}

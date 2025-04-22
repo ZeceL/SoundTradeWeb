@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Доступ запрещен";
+}
+
+<header>
+    <h1 class="text-danger">@ViewData["Title"]</h1> @* Класс Bootstrap *@
+    <p class="text-danger">У вас нет прав для доступа к этому ресурсу.</p>
+</header>
+<p>
+    Обратитесь к администратору сайта, если считаете, что это ошибка.
+</p>
+<p>
+    <a asp-controller="Home" asp-action="Index">Вернуться на главную</a>
+</p>

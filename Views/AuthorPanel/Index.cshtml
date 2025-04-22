@@ -1,0 +1,64 @@
+﻿@model IEnumerable<SoundTradeWebApp.Models.ViewModels.TrackIndexViewModel>
+@{
+    ViewData["Title"] = "Мои треки";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="author-panel-container" style="max-width: 900px; margin: 30px auto; padding: 20px; background-color: #282828; border-radius: 8px;">
+
+    <h2>@ViewData["Title"]</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" role="alert" style="background-color: rgba(76, 175, 80, 0.15); color: #a5d6a7; border-color: rgba(76, 175, 80, 0.3);">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <p>
+        <a asp-action="Upload" class="btn btn-primary" style="background-color: #007BFF; border-color: #007BFF; margin-bottom: 20px;">Загрузить новый трек</a>
+    </p>
+
+    @if (!Model.Any())
+    {
+        <p style="color: #ccc;">Вы еще не загрузили ни одного трека.</p>
+    }
+    else
+    {
+        <table class="table" style="color: #ccc; border-color: #444;">
+            <thead style="color: #eee;">
+                <tr style="border-color: #555 !important;">
+                    <th>Название</th>
+                    <th>Исполнитель</th>
+                    <th>Жанр</th>
+                    <th>Дата загрузки</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr style="border-color: #444 !important;">
+                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.Title)</td>
+                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.ArtistName)</td>
+                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.Genre)</td>
+                        @* Используем DisplayFor, который учтет DisplayFormat из ViewModel *@
+                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.UploadDate)</td>
+                        <td style="border-color: #444 !important;">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary" style="background-color: #5a6268; border-color: #5a6268;">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" style="background-color: #dc3545; border-color: #dc3545; margin-left: 5px;">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .author-panel-container .table tbody tr:hover {
+            background-color: #333;
+        }
+    </style>
+}
