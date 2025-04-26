@@ -1,75 +1,122 @@
-﻿@{
-    // Устанавливаем заголовок страницы, который будет использован в _Layout.cshtml
+﻿@model IEnumerable<SoundTradeWebApp.Models.ViewModels.TrackIndexViewModel>
+@{
     ViewData["Title"] = "Главная страница";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* Содержимое секции <main> из вашего index.txt *@
+
+
+@* --- Секция "Рекомендуем" (Заменяем содержимое) --- *@
+<div class="song-section">
+    <h2>Рекомендуем</h2>
+
+    @if (!Model.Any())
+    {
+        <p style="color: #ccc;">Рекомендованные треки пока отсутствуют.</p>
+    }
+    else
+    {
+        @* Используем div со стилем как в каталоге для единообразия и работы кнопок *@
+        <div class="song-list-detailed"> @* Используем новый класс или класс каталога (.song-list) *@
+            @foreach (var track in Model)
+            {
+                @* Используем разметку, похожую на .song-item из каталога *@
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                         @if (!string.IsNullOrEmpty(track.Genre)) { <span style="margin-right: 10px;">Жанр: @track.Genre</span> }
+                         @* Добавьте другие детали, если нужно *@
+                     </p>
+                     @* Кнопка "Слушать" с классом play-song-btn и data-атрибутом *@
+                     <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                     @* Можно добавить кнопку "Купить", если нужно *@
+                     @* <button class="buy-btn" data-song-id="@track.Id" style="padding: 8px 15px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Купить</button> *@
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* Оставляем другие секции (Поп музыка, Рок музыка и т.д.), если они нужны как статические *@
 <div class="song-section">
     <h2>Поп музыка</h2>
-    <ul class="song-list">
+    <ul class="song-list-simple">
+        @* Можно использовать другой класс для простого списка, если нужен *@
         <li>Песня 1 - Исполнитель</li>
         <li>Песня 2 - Исполнитель</li>
         <li>Песня 3 - Исполнитель</li>
         <li>Песня 4 - Исполнитель</li>
         <li>Песня 5 - Исполнитель</li>
         <li>Песня 6 - Исполнитель</li>
-        @* Сюда вы позже будете выводить реальные данные из базы данных *@
     </ul>
 </div>
 
 <div class="song-section">
-	<h2>Биты</h2>
-	<ul class="song-list">
-		<li>Бит 1 - Исполнитель</li>
-		<li>Бит 2 - Исполнитель</li>
-		<li>Бит 3 - Исполнитель</li>
-		<li>Бит 4 - Исполнитель</li>
-		<li>Бит 5 - Исполнитель</li>
-		<li>Бит 6 - Исполнитель</li>
-	</ul>
+    <h2>Рок музыка</h2>
+    <ul class="song-list-simple">
+        <li>Трек 1 - Группа</li>
+        <li>Трек 2 - Группа</li>
+        @* ... *@
+    </ul>
 </div>
 
-<div class="song-section">
-	<h2>Рекомендуем</h2>
-	<ul class="song-list">
-		<li>Рекомендация 1 - Исполнитель</li>
-		<li>Рекомендация 2 - Исполнитель</li>
-		<li>Рекомендация 3 - Исполнитель</li>
-		<li>Рекомендация 4 - Исполнитель</li>
-		<li>Рекомендация 5 - Исполнитель</li>
-		<li>Рекомендация 6 - Исполнитель</li>
-	</ul>
-</div>
 
-<div class="song-section">
-	<h2>Рекомендуем</h2>
-	<ul class="song-list">
-		<li>Рекомендация 1 - Исполнитель</li>
-		<li>Рекомендация 2 - Исполнитель</li>
-		<li>Рекомендация 3 - Исполнитель</li>
-		<li>Рекомендация 4 - Исполнитель</li>
-		<li>Рекомендация 5 - Исполнитель</li>
-		<li>Рекомендация 6 - Исполнитель</li>
-	</ul>
-</div>
 
-<div class="song-section">
-	<h2>Рекомендуем</h2>
-	<ul class="song-list">
-		<li>Рекомендация 1 - Исполнитель</li>
-		<li>Рекомендация 2 - Исполнитель</li>
-		<li>Рекомендация 3 - Исполнитель</li>
-		<li>Рекомендация 4 - Исполнитель</li>
-		<li>Рекомендация 5 - Исполнитель</li>
-		<li>Рекомендация 6 - Исполнитель</li>
-	</ul>
-</div>
-@* Добавьте остальные секции <main> из вашего index.txt, если они есть *@
+@* --- Обновленная секция стилей --- *@
+@section Styles {
+    <style>
+        /* Стиль для простых списков (остается) */
+        .song-list-simple {
+            list-style: none;
+            padding-left: 0;
+        }
 
-@* Если для главной страницы нужны свои скрипты, их можно добавить так: *@
-@* @section Scripts {
-    <script>
-        // Специфичный для главной страницы JS
-        console.log("Загружена главная страница!");
-    </script>
-} *@
+            .song-list-simple li {
+                background: #282828;
+                color: #ccc;
+                padding: 8px 12px;
+                margin-bottom: 5px;
+                border-radius: 4px;
+            }
+
+        /* --- Стиль для контейнера рекомендованных треков (CSS Grid) --- */
+        .song-list-detailed {
+            display: grid; /* Используем Grid Layout */
+            grid-template-columns: repeat(2, 1fr); /* Создаем 2 колонки равной ширины (1fr) */
+            gap: 35px; /* Пространство между колонками и рядами */
+            margin-top: 15px;
+            padding-left: 150px; /* <---- ДОБАВЛЕН ОТСТУП СЛЕВА */
+            padding-right: 10px; /* Оставляем небольшой отступ справа, если нужно */
+        }
+
+            /* Стили для .song-item внутри грида */
+            .song-list-detailed .song-item {
+                /* width: 100%; */ /* Уже установлено inline, но можно и здесь */
+                box-sizing: border-box; /* Чтобы padding учитывался в ширине */
+                /* Можно добавить другие стили для элементов внутри грида */
+                transition: transform 0.2s ease;
+            }
+
+                .song-list-detailed .song-item:hover {
+                    transform: translateY(-3px); /* Небольшой эффект при наведении */
+                }
+
+                .song-list-detailed .song-item button:hover {
+                    filter: brightness(1.1);
+                }
+
+        /* --- Адаптивность (пример): для маленьких экранов делаем 1 колонку --- */
+        @@media (max-width: 768px) {
+            .song-list-detailed {
+                grid-template-columns: 1fr; /* Одна колонка на маленьких экранах */
+                padding: 0; /* Убираем боковые отступы */
+            }
+
+                .song-list-detailed .song-item {
+                    width: 95%; /* Чуть меньше ширины экрана */
+                    margin: 0 auto 15px auto; /* Центрируем и добавляем отступ снизу */
+                }
+        }
+    </style>
+}

@@ -6,7 +6,10 @@
 
 <div class="author-panel-container" style="max-width: 900px; margin: 30px auto; padding: 20px; background-color: #282828; border-radius: 8px;">
 
-    <h2>@ViewData["Title"]</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Upload" class="btn btn-primary">Загрузить новый трек</a>
+    </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -14,10 +17,6 @@
             @TempData["SuccessMessage"]
         </div>
     }
-
-    <p>
-        <a asp-action="Upload" class="btn btn-primary" style="background-color: #007BFF; border-color: #007BFF; margin-bottom: 20px;">Загрузить новый трек</a>
-    </p>
 
     @if (!Model.Any())
     {
@@ -60,5 +59,21 @@
         .author-panel-container .table tbody tr:hover {
             background-color: #333;
         }
+
+        .btn-primary {
+            background-color: #4CAF50 !important; /* Яркий зеленый */
+            border-color: #4CAF50 !important;
+            color: #fff !important;
+            padding: 6px 12px !important; /* <--- Уменьшены верхний/нижний и левый/правый отступы */
+            font-size: 1em !important; /* Вернем размер шрифта к обычному или настройте по желанию */
+            border-radius: 5px !important; /* Уменьшим скругление, чтобы лучше сочеталось с меньшими отступами */
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2) !important; /* Немного уменьшим тень */
+            transition: background-color 0.3s ease !important;
+        }
+
+            .btn-primary:hover {
+                background-color: #45A049 !important;
+                border-color: #45A049 !important;
+            }
     </style>
 }

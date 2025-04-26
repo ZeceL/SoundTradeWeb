@@ -367,7 +367,7 @@ input[type='range'].volume-control {
 		cursor: pointer;
 	}
 	/* Стили для ползунка (Firefox) */
-	input[type='range'].volume-control::-moz-range-thumb {
+	input[type='range'].volume-control:-moz-range-thumb {
 		width: 14px;
 		height: 14px;
 		background: #4CAF50;
