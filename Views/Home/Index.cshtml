@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SoundTradeWebApp.Models.ViewModels.TrackIndexViewModel>
+﻿@model SoundTradeWebApp.Models.ViewModels.IndexPageViewModel
 @{
     ViewData["Title"] = "Главная страница";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,62 +6,179 @@
 
 
 
-@* --- Секция "Рекомендуем" (Заменяем содержимое) --- *@
+@* --- Секция "Рекомендуем" --- *@
 <div class="song-section">
     <h2>Рекомендуем</h2>
 
-    @if (!Model.Any())
+    @if (Model.RecommendedTracks == null || !Model.RecommendedTracks.Any())
     {
         <p style="color: #ccc;">Рекомендованные треки пока отсутствуют.</p>
     }
     else
     {
-        @* Используем div со стилем как в каталоге для единообразия и работы кнопок *@
-        <div class="song-list-detailed"> @* Используем новый класс или класс каталога (.song-list) *@
-            @foreach (var track in Model)
+        <div class="song-list-detailed">
+            @foreach (var track in Model.RecommendedTracks)
             {
-                @* Используем разметку, похожую на .song-item из каталога *@
                 <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
-                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
-                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
-                         @if (!string.IsNullOrEmpty(track.Genre)) { <span style="margin-right: 10px;">Жанр: @track.Genre</span> }
-                         @* Добавьте другие детали, если нужно *@
-                     </p>
-                     @* Кнопка "Слушать" с классом play-song-btn и data-атрибутом *@
-                     <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
-                     @* Можно добавить кнопку "Купить", если нужно *@
-                     @* <button class="buy-btn" data-song-id="@track.Id" style="padding: 8px 15px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Купить</button> *@
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
                 </div>
             }
         </div>
     }
 </div>
 
-@* Оставляем другие секции (Поп музыка, Рок музыка и т.д.), если они нужны как статические *@
+@* --- Секция "Поп музыка" --- *@
 <div class="song-section">
     <h2>Поп музыка</h2>
-    <ul class="song-list-simple">
-        @* Можно использовать другой класс для простого списка, если нужен *@
-        <li>Песня 1 - Исполнитель</li>
-        <li>Песня 2 - Исполнитель</li>
-        <li>Песня 3 - Исполнитель</li>
-        <li>Песня 4 - Исполнитель</li>
-        <li>Песня 5 - Исполнитель</li>
-        <li>Песня 6 - Исполнитель</li>
-    </ul>
+    @if (Model.PopTracks == null || !Model.PopTracks.Any())
+    {
+        <p style="color: #ccc;">Поп треки пока отсутствуют.</p>
+    }
+    else
+    {
+        <div class="song-list-detailed">
+            @* Используем тот же класс для стилизации *@
+            @foreach (var track in Model.PopTracks)
+            {
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                </div>
+            }
+        </div>
+    }
 </div>
 
+@* --- Секция "Рок музыка" --- *@
 <div class="song-section">
     <h2>Рок музыка</h2>
-    <ul class="song-list-simple">
-        <li>Трек 1 - Группа</li>
-        <li>Трек 2 - Группа</li>
-        @* ... *@
-    </ul>
+    @if (Model.RockTracks == null || !Model.RockTracks.Any())
+    {
+        <p style="color: #ccc;">Рок треки пока отсутствуют.</p>
+    }
+    else
+    {
+        <div class="song-list-detailed">
+            @* Используем тот же класс для стилизации *@
+            @foreach (var track in Model.RockTracks)
+            {
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                </div>
+            }
+        </div>
+    }
 </div>
 
+@* --- Секция "Хип-хоп музыка" --- *@
+<div class="song-section">
+    <h2>Хип-хоп музыка</h2>
+    @if (Model.HipHopTracks == null || !Model.HipHopTracks.Any())
+    {
+        <p style="color: #ccc;">Хип-хоп треки пока отсутствуют.</p>
+    }
+    else
+    {
+        <div class="song-list-detailed">
+            @* Используем тот же класс для стилизации *@
+            @foreach (var track in Model.HipHopTracks)
+            {
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                </div>
+            }
+        </div>
+    }
+</div>
 
+@* --- Секция "Джаз музыка" --- *@
+<div class="song-section">
+    <h2>Джаз музыка</h2>
+    @if (Model.JazzTracks == null || !Model.JazzTracks.Any())
+    {
+        <p style="color: #ccc;">Джаз треки пока отсутствуют.</p>
+    }
+    else
+    {
+        <div class="song-list-detailed">
+            @* Используем тот же класс для стилизации *@
+            @foreach (var track in Model.JazzTracks)
+            {
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* --- Секция "Электронная музыка" --- *@
+<div class="song-section">
+    <h2>Электронная музыка</h2>
+    @if (Model.ElectronicTracks == null || !Model.ElectronicTracks.Any())
+    {
+        <p style="color: #ccc;">Электронные треки пока отсутствуют.</p>
+    }
+    else
+    {
+        <div class="song-list-detailed">
+            @* Используем тот же класс для стилизации *@
+            @foreach (var track in Model.ElectronicTracks)
+            {
+                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                    </p>
+                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @* --- Обновленная секция стилей --- *@
 @section Styles {
