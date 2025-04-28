@@ -1,0 +1,58 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Редактирование профиля";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@* Используем контейнер как на Login/Register *@
+<div class="account-form-container">
+
+    <h2 style="color: #eee; text-align: center; margin-bottom: 25px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Username" class="control-label"></label>
+            <input asp-for="Username" class="form-control" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <hr style="border-color: #444; margin: 25px 0;" />
+        <h4 style="color: #bbb; margin-bottom: 15px;">Смена пароля (необязательно)</h4>
+
+
+        <div class="form-group mb-3">
+            <label asp-for="NewPassword" class="control-label"></label>
+            <input asp-for="NewPassword" class="form-control" placeholder="Введите новый пароль" />
+            <span asp-validation-for="NewPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ConfirmPassword" class="control-label"></label>
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="Повторите новый пароль" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group mt-4 d-grid gap-2 d-sm-flex justify-content-sm-end">
+            <a asp-action="Index" class="btn btn-secondary" style="background-color: #6c757d; border-color: #6c757d;">Отмена</a>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

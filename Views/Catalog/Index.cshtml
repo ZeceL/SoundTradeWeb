@@ -9,25 +9,23 @@
     <button id="toggleContent">Переключить на тексты песен</button>
 
     @* --- Контейнер для поиска и фильтров --- *@
-    @* Используем Flexbox, выравнивание по центру, перенос строк *@
     <div class="filter-controls">
         @* Стили для этого класса будут в @section Styles *@
 
-        @* --- Форма Поиска --- *@
-        @* Убрали flex-grow, min-width из inline стилей, добавили класс search-form *@
+        @* --- Форма Поиска (с классом search-form) --- *@
         <form method="get" asp-controller="Catalog" asp-action="Index" class="search-form">
             <label asp-for="SearchString" class="visually-hidden">Поиск</label>
-            @* Убрали flex-grow, добавили класс search-input *@
+            @* Поле ввода с классом search-input *@
             <input type="text" asp-for="SearchString" placeholder="Поиск по названию или автору..." class="form-control search-input" />
             <button type="submit" class="btn btn-search">Поиск</button>
         </form>
 
-        @* --- Форма Фильтров --- *@
-        @* Добавили класс filter-form *@
+        @* --- Форма Фильтров (с классом filter-form) --- *@
         <form method="get" asp-controller="Catalog" asp-action="Index" class="filter-form">
             <input type="hidden" name="SearchString" value="@Model.SearchString" /> @* Сохраняем поиск *@
 
             <div>
+                @* Обертки для каждого select + label (если бы он был видимым) *@
                 <label asp-for="SelectedGenre" class="visually-hidden"></label>
                 <select asp-for="SelectedGenre" asp-items="@Model.AvailableGenres" class="form-control filter-select"></select>
             </div>
@@ -44,7 +42,6 @@
             </div>
         </form>
     </div>
-   
     @* --- Список Песен --- *@
     <div class="song-list">
         @if (!Model.Tracks.Any()) @* <--- Используем Model.Tracks *@
@@ -155,62 +152,77 @@
     </script>
 }
 
+@* --- Секция Стилей --- *@
 @section Styles {
     <style>
-        /* Стили для контейнера фильтров */
+        /* Контейнер для всех контролов */
         .filter-controls {
             display: flex;
-            align-items: center; /* Выравниваем элементы по вертикали */
-            flex-wrap: wrap; /* Разрешаем перенос на новую строку */
-            /* gap: 15px; */ /* Убираем общий gap */
+            align-items: center;
+            flex-wrap: wrap;
             background-color: #252525;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 30px;
+            /* Убираем общий gap, чтобы управлять отступом через margin */
+            /* gap: 15px; */
         }
 
-            /* --- Стилизация формы поиска --- */
+            /* --- Форма поиска --- */
             .filter-controls .search-form {
-                display: flex; /* Элементы формы (input, button) в строку */
+                display: flex;
                 align-items: center;
-                gap: 10px; /* Отступ между полем ввода и кнопкой */
-                margin-right: 100px; /* <<-- ОТСТУП 100px СПРАВА от формы поиска */
-                margin-bottom: 10px; /* Отступ снизу на случай переноса строки */
+                gap: 10px; /* Отступ между полем и кнопкой поиска */
+                margin-right: 100px; /* <<-- ОТСТУП 100px СПРАВА */
+                /* Убираем flex-grow, чтобы форма не растягивалась */
+                /* flex-grow: 1; */
+                margin-bottom: 10px; /* Отступ снизу на случай переноса */
             }
-            /* Задаем фиксированную ширину для поля поиска */
+            /* Устанавливаем ширину поля поиска */
             .filter-controls .search-input {
-                width: 250px; /* <<-- УМЕНЬШЕННЫЙ РАЗМЕР ПОЛЯ ПОИСКА (подберите значение) */
-                /* flex-grow: 1; */ /* Убрали растягивание */
+                width: 250px; /* <<-- ЖЕЛАЕМАЯ ШИРИНА ПОЛЯ ПОИСКА */
+                /* flex-grow: 0; */ /* Убедимся, что не растягивается */
             }
 
-            /* --- Стилизация формы фильтров --- */
+            /* --- Форма фильтров --- */
             .filter-controls .filter-form {
                 display: flex;
                 align-items: center;
-                flex-wrap: wrap; /* Разрешаем перенос фильтров */
+                flex-wrap: wrap;
                 gap: 10px; /* Отступ между элементами фильтров */
-                margin-bottom: 10px; /* Отступ снизу на случай переноса строки */
+                margin-bottom: 10px; /* Отступ снизу на случай переноса */
+                /* Форма фильтров будет занимать оставшееся место */
+                flex-grow: 1;
+                justify-content: flex-start; /* Выравнивание фильтров по левому краю */
             }
+                /* Обертка для select/button внутри формы фильтров */
+                .filter-controls .filter-form div {
+                    /* Можно добавить стили, если нужно */
+                }
 
-            /* --- Общие стили для input и select внутри .filter-controls --- */
-            /* (Эти стили гарантируют одинаковый вид) */
+            /* --- Общие стили для полей ввода и списков в этом блоке --- */
             .filter-controls .form-control {
                 padding: 8px 12px;
                 border-radius: 5px;
                 border: 1px solid #555;
-                background: #333; /* Темный фон */
-                color: white; /* Светлый текст */
+                background: #333;
+                color: white;
                 font-size: 0.95em;
                 height: 38px;
                 box-sizing: border-box;
-                line-height: normal; /* Для input type=text */
+                line-height: normal; /* Важно для input type=text */
             }
 
-                .filter-controls .form-control:focus {
-                    border-color: #4CAF50;
-                    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
-                    outline: none;
-                }
+            .filter-controls select.form-control {
+                /* Минимальная ширина для селектов, чтобы текст не обрезался сильно */
+                min-width: 140px;
+            }
+
+            .filter-controls .form-control:focus {
+                border-color: #4CAF50;
+                box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+                outline: none;
+            }
 
             /* --- Стили для кнопок --- */
             .filter-controls .btn {
@@ -222,16 +234,15 @@
                 height: 38px;
                 transition: background-color 0.2s, transform 0.1s;
                 white-space: nowrap;
+                color: white; /* Общий цвет текста */
             }
 
-            .filter-controls .btn-search { /* Кнопка Поиск */
-                background: #0d6efd; /* Синий Bootstrap */
-                color: white;
+            .filter-controls .btn-search {
+                background: #0d6efd; /* Синий */
             }
 
-            .filter-controls .btn-filter { /* Кнопка Фильтры */
-                background: linear-gradient(45deg, #ff416c, #ff4b2b);
-                color: white;
+            .filter-controls .btn-filter {
+                background: linear-gradient(45deg, #ff416c, #ff4b2b); /* Градиент */
             }
 
             .filter-controls .btn:hover {
@@ -255,76 +266,42 @@
             border: 0;
         }
 
-        /* Адаптивность: можно настроить отступ и ширину для маленьких экранов */
-        @@media (max-width: 992px) { /* Пример точки перелома */
-            .filter-controls .search-form {
-                margin-right: 15px; /* Уменьшаем отступ на средних экранах */
-                min-width: 200px; /* Уменьшаем минимальную ширину */
-            }
-
-            .filter-controls .search-input {
-                width: 200px; /* Уменьшаем поле поиска */
+        /* Адаптивность: на маленьких экранах убираем смещение и max-width */
+        @@media (max-width: 992px) { /* Точку перелома можно изменить */
+            .catalog-page-content .song-list {
+                max-width: 100%; /* Сетка может занимать всю ширину */
+                margin-left: 0; /* Убираем авто-отступ */
+                margin-right: 0; /* Убираем правый отступ */
             }
         }
 
         @@media (max-width: 768px) {
-            .filter-controls {
-                flex-direction: column; /* Все элементы друг под другом */
-                align-items: stretch; /* Растягиваем по ширине */
-                gap: 15px; /* Возвращаем gap для вертикальных отступов */
+            .catalog-page-content .song-list {
+                grid-template-columns: 1fr; /* Одна колонка */
+                gap: 10px;
             }
-
-                .filter-controls .search-form {
-                    margin-right: 0; /* Убираем правый отступ */
-                    width: 100%; /* Форма поиска на всю ширину */
-                }
-
-                .filter-controls .search-input {
-                    width: auto; /* Поле поиска растягивается */
-                    flex-grow: 1; /* Возвращаем растягивание */
-                }
-
-                .filter-controls .filter-form {
-                    width: 100%; /* Форма фильтров на всю ширину */
-                    justify-content: space-around; /* Распределяем фильтры */
-                }
-
-                    .filter-controls .filter-form div {
-                        flex-grow: 1; /* Позволяем оберткам фильтров растягиваться */
-                    }
-
-                    .filter-controls .filter-form select {
-                        width: 100%; /* Выпадающие списки на всю ширину обертки */
-                    }
-
-                    .filter-controls .filter-form div:last-child { /* Кнопка фильтров */
-                        flex-grow: 0; /* Не растягиваем кнопку */
-                    }
         }
 
-        .lyrics-item h2 {
-            /* Можно немного уменьшить нижний отступ у заголовка, если кнопка под ним */
-            /* margin-bottom: 5px; */
+        /* --- Стили для контейнера списка треков в каталоге --- */
+        .catalog-page-content .song-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            /* --- Новые/Измененные строки для смещения вправо --- */
+            max-width: 900px; /* ЗАДАЙТЕ МАКС. ШИРИНУ СЕТКИ (подберите значение) */
+            margin-left: auto; /* Автоматический левый отступ (двигает вправо) */
+            margin-right: 0; /* Правый отступ 0 (прижимает к правому краю доступного пространства) */
+            /* Можете поставить небольшой margin-right, если не хотите прижимать вплотную, например: margin-right: 20px; */
+            /* --- Конец изменений --- */
         }
 
-        .lyrics-item .play-song-btn {
-            /* Стили из inline можно перенести сюда */
-            padding: 5px 10px;
-            font-size: 0.85em; /* Чуть меньше основной кнопки */
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            line-height: 1;
-            vertical-align: middle; /* Выравнивание по центру строки с h2 */
-            margin-left: 10px; /* Отступ от заголовка */
-            transition: background-color 0.2s;
-        }
-
-            .lyrics-item .play-song-btn:hover {
-                filter: brightness(1.1);
+            /* Стили для элемента трека (.song-item) внутри сетки каталога */
+            .catalog-page-content .song-list .song-item {
+                width: 100%; /* Занимает всю ширину ячейки грида */
+                box-sizing: border-box;
+                margin-bottom: 0;
+                /* ... остальные стили .song-item ... */
             }
-
     </style>
 }
