@@ -213,5 +213,194 @@ namespace SoundTradeWebApp.Controllers
                 };
             }
         }
+
+        // GET: /AuthorPanel/Delete/{id} - Показывает страницу подтверждения удаления
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                _logger.LogWarning("AuthorPanel/Delete GET: Не удалось получить ID автора из клеймов.");
+                return Unauthorized("Не удалось определить пользователя.");
+            }
+
+            var track = await _context.Tracks
+                .FirstOrDefaultAsync(m => m.Id == id && m.AuthorUserId == userId); // Проверяем принадлежность трека текущему пользователю
+
+            if (track == null)
+            {
+                return NotFound();
+            }
+
+            return View(track); // Вам потребуется создать представление Delete.cshtml для подтверждения
+        }
+
+        // POST: /AuthorPanel/Delete/{id} - Обрабатывает удаление трека
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                _logger.LogWarning("AuthorPanel/Delete POST: Не удалось получить ID автора из клеймов.");
+                return Unauthorized("Не удалось определить пользователя.");
+            }
+
+            var track = await _context.Tracks
+                .FirstOrDefaultAsync(m => m.Id == id && m.AuthorUserId == userId); // Снова проверяем принадлежность трека
+
+            if (track == null)
+            {
+                // Трек уже был удален или никогда не существовал
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Tracks.Remove(track);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Трек '{TrackTitle}' (ID: {TrackId}) удален автором {AuthorId}.", track.Title, track.Id, userId);
+                TempData["SuccessMessage"] = $"Трек '{track.Title}' успешно удален!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка при удалении трека '{TrackTitle}' (ID: {TrackId}) автором {AuthorId}.", track.Title, track.Id, userId);
+                TempData["ErrorMessage"] = $"Ошибка при удалении трека '{track.Title}'."; // Сообщение об ошибке для пользователя
+                                                                                          // Возможно, стоит перенаправить на страницу ошибки или обратно на Index с сообщением
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // GET: /AuthorPanel/Edit/{id} - Показывает форму редактирования трека
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                _logger.LogWarning("AuthorPanel/Edit GET: Не удалось получить ID автора из клеймов.");
+                return Unauthorized("Не удалось определить пользователя.");
+            }
+
+            // Находим трек и проверяем принадлежность текущему пользователю
+            var track = await _context.Tracks
+                .FirstOrDefaultAsync(t => t.Id == id && t.AuthorUserId == userId);
+
+            if (track == null)
+            {
+                return NotFound();
+            }
+
+            // Создаем ViewModel и заполняем ее данными из трека
+            var viewModel = new UploadTrackViewModel // Используем ту же ViewModel, что и для загрузки
+            {
+                Id = track.Id, // Добавляем ID для сохранения при редактировании
+                Title = track.Title,
+                // ArtistName не редактируется пользователем, он берется из клеймов
+                Genre = track.Genre,
+                VocalType = track.VocalType,
+                Mood = track.Mood,
+                Lyrics = track.Lyrics,
+                // AudioFile сюда не загружается, это только для input type="file"
+                // Добавьте поля, если у вас есть другие свойства трека, которые можно редактировать
+            };
+
+            // Заполняем списки для dropdowns
+            PopulateDropdownLists(viewModel); // Используем тот же вспомогательный метод
+
+            return View(viewModel);
+        }
+
+        // POST: /AuthorPanel/Edit/{id} - Обрабатывает отправку формы редактирования
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(200 * 1024 * 1024)] // Пример лимита, убедитесь, что соответствует вашим требованиям
+        public async Task<IActionResult> Edit(UploadTrackViewModel model) // Принимаем ViewModel
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                ModelState.AddModelError("", "Ошибка идентификации пользователя.");
+                PopulateDropdownLists(model);
+                return View(model);
+            }
+
+            // Находим существующий трек по ID и проверяем принадлежность
+            var existingTrack = await _context.Tracks
+                .FirstOrDefaultAsync(t => t.Id == model.Id && t.AuthorUserId == userId);
+
+            if (existingTrack == null)
+            {
+                return NotFound(); // Или другая обработка, если трек не найден (удален другим пользователем?)
+            }
+
+            // Валидация файла ТОЛЬКО если пользователь загрузил новый
+            if (model.AudioFile != null && model.AudioFile.Length > 0)
+            {
+                // ... добавьте здесь те же проверки файла, что и в методе Upload ...
+                if (model.AudioFile.Length > 20 * 1048576) // Пример лимита 20MB
+                {
+                    ModelState.AddModelError(nameof(model.AudioFile), "Новый файл превышает допустимый размер (20MB).");
+                }
+                // ... другие проверки типа файла и т.д. ...
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Обновляем свойства существующего трека из ViewModel
+                    existingTrack.Title = model.Title;
+                    existingTrack.Genre = model.Genre;
+                    existingTrack.VocalType = model.VocalType;
+                    existingTrack.Mood = model.Mood;
+                    existingTrack.Lyrics = model.Lyrics;
+                    // ArtistName не обновляется, так как зависит от пользователя
+
+                    // Если загружен новый аудиофайл, обновляем его
+                    if (model.AudioFile != null && model.AudioFile.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await model.AudioFile.CopyToAsync(memoryStream);
+                            existingTrack.AudioFileContent = memoryStream.ToArray();
+                            existingTrack.AudioContentType = model.AudioFile.ContentType;
+                            // Возможно, стоит обновить дату загрузки, если файл новый?
+                            // existingTrack.UploadDate = DateTime.UtcNow;
+                        }
+                    }
+                    // Если файл не загружен, AudioFileContent и AudioContentType остаются прежними
+
+                    _context.Update(existingTrack); // Помечаем трек как измененный
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Трек '{TrackTitle}' (ID: {TrackId}) обновлен автором {AuthorId}.", existingTrack.Title, existingTrack.Id, userId);
+                    TempData["SuccessMessage"] = $"Трек '{existingTrack.Title}' успешно обновлен!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Ошибка при обновлении трека '{TrackTitle}' (ID: {TrackId}) автором {AuthorId}.", existingTrack.Title, existingTrack.Id, userId);
+                    ModelState.AddModelError("", "Произошла внутренняя ошибка при сохранении изменений.");
+                }
+            }
+            // Если модель невалидна или произошла ошибка, возвращаем форму с ошибками
+            PopulateDropdownLists(model); // Перезаполняем списки перед возвратом
+            return View(model);
+        }
     }
 }

@@ -1,0 +1,64 @@
+﻿@model SoundTradeWebApp.Models.Track // Указываем модель - один трек
+
+@{
+    ViewData["Title"] = "Потверждение удаления";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="author-panel-container" style="max-width: 600px; margin: 30px auto; padding: 20px; background-color: #282828; border-radius: 8px; color: #ccc;">
+
+    <h2>Удалить трек</h2>
+
+    <h3 style="color: #dc3545;">Вы уверены, что хотите удалить этот трек?</h3>
+
+    <div>
+        <h4 style="color: #eee;">Информация о треке:</h4>
+        <hr style="border-color: #444;" />
+        <dl class="row">
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.ArtistName)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.ArtistName)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Genre)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.Genre)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.UploadDate)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.UploadDate)
+            </dd>
+            @* Добавьте другие поля, которые хотите показать для подтверждения *@
+        </dl>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Удалить" class="btn btn-danger" style="background-color: #dc3545; border-color: #dc3545;" />
+            <a asp-action="Index" class="btn btn-secondary" style="background-color: #5a6268; border-color: #5a6268; margin-left: 10px;">Отмена</a>
+        </form>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .author-panel-container .row {
+            margin-bottom: 10px;
+        }
+
+        .author-panel-container dt,
+        .author-panel-container dd {
+            padding: 5px 0;
+        }
+    </style>
+}

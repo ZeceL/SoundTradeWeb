@@ -7,6 +7,8 @@ namespace SoundTradeWebApp.Models.ViewModels
 {
     public class UploadTrackViewModel
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Введите название трека")]
         [StringLength(200)]
         [Display(Name = "Название трека")]
