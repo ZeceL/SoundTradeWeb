@@ -14,6 +14,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+// --- Регистрация Настроек Аукциона ---
+builder.Services.Configure<SoundTradeWebApp.Models.Configuration.AuctionSettings>(
+    builder.Configuration.GetSection("AuctionSettings"));
+
+// --- Регистрация Фоновой Службы Аукциона ---
+builder.Services.AddHostedService<SoundTradeWebApp.Services.AuctionStartService>();
+
 // 3. Настройка Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

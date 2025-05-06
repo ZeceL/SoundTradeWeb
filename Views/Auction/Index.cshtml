@@ -1,0 +1,166 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.AuctionIndexViewModel
+@{
+    ViewData["Title"] = "Аукцион треков";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-form-container" style="max-width: 800px;">
+
+    <h2 style="color: #eee; text-align: center; margin-bottom: 25px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+     @* Сообщения TempData *@
+     @if (TempData["SuccessMessage"] != null) { <div class="alert alert-success">@TempData["SuccessMessage"]</div> }
+     @if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.1); color: #f1aeb5; border-color: rgba(220, 53, 69, 0.2);">@TempData["ErrorMessage"]</div> }
+     @if (TempData["WarningMessage"] != null) { <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); color: #ffe187; border-color: rgba(255, 193, 7, 0.2);">@TempData["WarningMessage"]</div> }
+
+    @* --- Логика отображения --- *@
+
+    @if (Model.IsAuctionActive && Model.CurrentAuction != null)
+    {
+        @* --- Отображение Активного Аукциона --- *@
+        var auction = Model.CurrentAuction;
+        <div class="active-auction-details" style="color: #ccc;">
+            <h3 style="color: #4CAF50; text-align: center; margin-bottom: 20px;">Идет аукцион!</h3>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+
+                @* --- Информация о треке --- *@
+                <div style="flex-basis: 300px; flex-grow: 1;">
+                    <h4 style="color: #eee; margin-bottom: 10px;">Лот: @auction.TrackTitle</h4>
+                    <p style="margin-bottom: 5px;">Автор: @auction.ArtistName</p>
+                    <button class="play-song-btn profile-play-btn"
+                            data-song-url="@auction.AudioUrl"
+                            data-title="@auction.TrackTitle"
+                            data-artist="@auction.ArtistName">
+                        ▶ Слушать
+                    </button>
+                    <p style="margin-top: 15px;">Начальная ставка: <strong>@auction.StartingBid.ToString("N2") руб.</strong></p>
+                    <p>Шаг ставки: <strong>@auction.BidIncrement руб.</strong></p>
+                </div>
+
+                @* --- Информация о торгах --- *@
+                <div style="flex-basis: 300px; flex-grow: 1; text-align: right;">
+                    <div style="font-size: 1.4em; margin-bottom: 10px;">
+                        Текущая ставка: <strong style="color: #81c784;">@(auction.CurrentBid?.ToString("N2") ?? "Нет ставок") руб.</strong>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        Лидер: <strong style="color: #64b5f6;">@auction.HighestBidderUsername</strong>
+                    </div>
+                     <div style="font-size: 1.1em; margin-bottom: 15px;">
+                         Мин. следующая ставка: <strong style="color: #ffb74d;">@auction.NextMinimumBid.ToString("N2") руб.</strong>
+                     </div>
+                     <div id="timer" style="font-size: 1.2em; font-weight: bold; color: #ff8a8a;">
+                         Осталось: <span data-endtime="@auction.EndTime.ToString("o")">@auction.TimeRemaining.ToString(@"hh\:mm\:ss")</span>
+                     </div>
+                </div>
+            </div>
+
+            <hr style="border-color: #444; margin: 25px 0;" />
+
+            @* --- Форма для новой ставки --- *@
+            <form asp-controller="Auction" asp-action="PlaceBid" method="post" style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 20px;">
+                @Html.AntiForgeryToken()
+                @* Используем имя "AuctionId", как в PlaceBidViewModel *@
+                <input type="hidden" name="AuctionId" value="@auction.AuctionId" />
+
+                <div class="form-group mb-0">
+                    <label asp-for="CurrentAuction.NewBidAmount" class="visually-hidden"></label>
+                    @* Используем имя "BidAmount", как в PlaceBidViewModel *@
+                    <input asp-for="CurrentAuction.NewBidAmount" name="BidAmount"
+                           type="number"
+                           step="0.01"
+                           min="@auction.NextMinimumBid"
+                           class="form-control"
+                           placeholder="@($"мин. {auction.NextMinimumBid:N2}")"
+                           style="width: 150px;" />
+                    @* Прямое отображение ошибок для этой формы здесь не сработает из-за редиректа,
+                полагаемся на TempData *@
+                </div>
+                <button type="submit" class="btn btn-success" style="background-color: #28a745; border-color: #28a745;">Сделать ставку</button>
+            </form>
+             @* TODO: Отображение ошибок валидации для ставки *@
+             @* <div asp-validation-summary="ModelOnly" class="text-danger mt-2 text-center"></div> *@
+
+        </div>
+         @* --- Конец отображения Активного Аукциона --- *@
+    }
+    else if (Model.CanSubmitTrack && Model.NewSubmission != null)
+    {
+        @* --- Отображение Формы Подачи Заявки (код без изменений) --- *@
+        <div class="submit-track-form">
+             <h4 style="color: #bbb; margin-bottom: 15px;">Активного аукциона нет. Вы можете предложить свой трек:</h4>
+             <form asp-action="SubmitTrack" method="post">
+                 @Html.AntiForgeryToken()
+                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                 @* ... поля формы TrackId, StartingBid, BidIncrement ... *@
+                  <div class="form-group mb-3">
+                     <label asp-for="NewSubmission.TrackId" class="control-label"></label>
+                     <select asp-for="NewSubmission.TrackId" asp-items="@Model.NewSubmission.AvailableTracks" class="form-control"></select>
+                     <span asp-validation-for="NewSubmission.TrackId" class="text-danger"></span>
+                 </div>
+                 <div class="form-group mb-3">
+                     <label asp-for="NewSubmission.StartingBid" class="control-label"></label>
+                     <input asp-for="NewSubmission.StartingBid" type="number" step="0.01" min="1" class="form-control" placeholder="Например: 5000.00" />
+                     <span asp-validation-for="NewSubmission.StartingBid" class="text-danger"></span>
+                 </div>
+                  <div class="form-group mb-3">
+                     <label asp-for="NewSubmission.BidIncrement" class="control-label"></label>
+                     <select asp-for="NewSubmission.BidIncrement" asp-items="@Model.NewSubmission.AvailableIncrements" class="form-control"></select>
+                     <span asp-validation-for="NewSubmission.BidIncrement" class="text-danger"></span>
+                 </div>
+                  <div class="form-group mt-4 d-grid gap-2 d-sm-flex justify-content-sm-end">
+                      <button type="submit" class="btn btn-primary">Предложить трек</button>
+                  </div>
+             </form>
+        </div>
+    }
+    else
+    {
+         @* --- Отображение Сообщения "Нет аукциона" (код без изменений) --- *@
+         <div class="no-auction-info">
+             <p style="color: #ccc; text-align: center; font-size: 1.1em;">В данный момент активных аукционов нет.</p>
+             @if (User.IsInRole("Author")) { <p style="color: #aaa; text-align: center;">Вы сможете предложить свой трек, когда появится такая возможность.</p> }
+             else { <p style="color: #aaa; text-align: center;">Загляните позже, чтобы принять участие в торгах!</p> }
+        </div>
+    }
+
+</div>
+
+@* --- Скрипты для таймера (и SignalR в будущем) --- *@
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    @if (Model.IsAuctionActive && Model.CurrentAuction != null)
+    {
+        <script>
+            // Простой JS таймер обратного отсчета
+            const timerElement = document.querySelector('#timer span');
+            if (timerElement) {
+                const endTime = new Date(timerElement.dataset.endtime); // Получаем время окончания из data-атрибута
+
+                function updateTimer() {
+                    const now = new Date();
+                    const diff = endTime - now;
+
+                    if (diff <= 0) {
+                        timerElement.textContent = "Завершено!";
+                        // TODO: Здесь можно обновить страницу или показать сообщение о завершении
+                        // window.location.reload(); // Простой вариант - перезагрузка
+                        clearInterval(timerInterval); // Останавливаем таймер
+                        return;
+                    }
+
+                    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+                    const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                    const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+
+                    timerElement.textContent = `<span class="math-inline">\{hours\}\:</span>{minutes}:${seconds}`;
+                }
+
+                const timerInterval = setInterval(updateTimer, 1000); // Обновляем каждую секунду
+                updateTimer(); // Вызываем сразу для первого отображения
+            }
+        </script>
+    }
+}
