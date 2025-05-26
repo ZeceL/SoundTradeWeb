@@ -1,0 +1,86 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.NotificationIndexViewModel
+@{
+    ViewData["Title"] = "Мои Уведомления";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-form-container" style="max-width: 900px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #eee; margin-bottom: 0;">@ViewData["Title"] (@Model.UnreadCount непрочитанных)</h2>
+        @if (Model.Notifications.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllAsRead" method="post" style="margin-bottom: 0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-secondary" style="background-color: #4e555b; border-color: #4e555b; color:white;">Отметить все как прочитанные</button>
+            </form>
+        }
+    </div>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.1); color: #f1aeb5; border-color: rgba(220, 53, 69, 0.2);">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info" style="background-color: rgba(23, 162, 184, 0.1); color: #a6e1ec; border-color: rgba(23, 162, 184, 0.2);">@TempData["InfoMessage"]</div>
+    }
+
+
+    @if (Model.Notifications.Any())
+    {
+        <ul class="list-group" style="background-color: transparent;">
+            @foreach (var notification in Model.Notifications)
+            {
+                <li class="list-group-item @(notification.IsRead ? "notification-read" : "notification-unread")"
+                    style="background-color: @(notification.IsRead ? "#282828" : "#333"); border-color: #444; color: #ccc; margin-bottom: 10px; border-radius: 5px; padding: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex-grow: 1;">
+                            <p style="margin-bottom: 5px; font-weight: @(notification.IsRead ? "normal" : "bold");">
+                                @notification.Message
+                            </p>
+                            <small class="text-muted" style="color: #888 !important;">@notification.CreatedDate.ToString("dd.MM.yyyy HH:mm") (@notification.TimeAgo)</small>
+                        </div>
+                        <div style="margin-left: 15px; white-space: nowrap;">
+                            @if (!string.IsNullOrEmpty(notification.LinkUrl))
+                            {
+                                <form asp-action="MarkAsRead" asp-route-id="@notification.Id" method="post" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-primary">Перейти</button>
+                                </form>
+                            }
+                            else if (!notification.IsRead)
+                            {
+                                <form asp-action="MarkAsRead" asp-route-id="@notification.Id" method="post" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" style="background-color: #5a6268; border-color: #5a6268; color:white;">Прочитано</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p style="color:#aaa; text-align:center;">У вас пока нет уведомлений.</p>
+    }
+</div>
+
+@* Дополнительные стили для непрочитанных уведомлений *@
+@section Styles {
+    <style>
+        .notification-unread {
+            border-left: 5px solid #007bff !important; /* Синяя полоска слева для непрочитанных */
+        }
+
+        .list-group-item p {
+            line-height: 1.4;
+        }
+    </style>
+}

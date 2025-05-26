@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SoundTradeWebApp.Data;
-using SoundTradeWebApp.Enums; // Для AuctionStatus
+using SoundTradeWebApp.Enums;
 using SoundTradeWebApp.Models;
 using SoundTradeWebApp.Models.ViewModels;
 using System;

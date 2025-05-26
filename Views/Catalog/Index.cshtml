@@ -63,6 +63,19 @@
                     </p>
                      @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
                      <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        int.TryParse(currentUserIdString, out int currentUserId);
+
+                        @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                        {
+                            <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                               class="btn btn-info" style="margin-top: 10px; margin-left: 5px; background-color: #17a2b8; border-color: #17a2b8;">
+                                Предложить обмен
+                            </a>
+                        }
+                    }
                      <button class="buy-btn" data-song-id="@track.Id">Купить</button>
                 </div>
             }

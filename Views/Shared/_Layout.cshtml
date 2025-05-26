@@ -14,13 +14,25 @@
             <ul>
                 <li><a asp-controller="Catalog" asp-action="Index">Каталог</a></li>
                 <li><a asp-controller="Auction" asp-action="Index">Аукцион</a></li>
-                <li><a href="#">О нас</a></li>
                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                        <li><a asp-controller="Profile" asp-action="Index">Профиль</a></li> @* Пример ссылки на будущий контроллер профиля *@
+                        
                     @if (User.IsInRole("Author")) // Проверяем роль пользователя (из клейма)
                     {
-                                <li><a asp-controller="AuthorPanel" asp-action="Index">Панель автора</a></li> @* Пример ссылки для авторов *@
+                        <li>
+                            <a asp-controller="AuthorPanel" asp-action="Index">Панель автора</a>
+                        </li> @* Пример ссылки для авторов *@
+                        <li>
+                            <a asp-controller="Profile" asp-action="Index">Профиль</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Notification" asp-action="Index" style="position: relative;">
+                                Уведомления
+                                <span id="notification-indicator" class="badge bg-danger"
+                                      style="position: absolute; top: -5px; right: -10px; display: none; font-size: 0.65em; padding: 3px 5px;">
+                                </span>
+                            </a>
+                        </li>
                     }
                 }
             </ul>
@@ -85,6 +97,42 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/script.js" asp-append-version="true"></script>
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <script>
+            function fetchUnreadNotificationCount() {
+                fetch('@Url.Action("GetUnreadCount", "Notification")') // Используем Url.Action для генерации URL
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok for notification count');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const indicator = document.getElementById('notification-indicator');
+                        if (indicator) {
+                            if (data.count > 0) {
+                                indicator.textContent = data.count;
+                                indicator.style.display = 'inline-block'; // Показываем
+                            } else {
+                                indicator.style.display = 'none'; // Скрываем, если 0
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при получении количества непрочитанных уведомлений:', error);
+                        const indicator = document.getElementById('notification-indicator');
+                        if (indicator) indicator.style.display = 'none'; // Скрываем при ошибке
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchUnreadNotificationCount(); // При загрузке страницы
+                // Опционально: периодически обновлять счетчик
+                // setInterval(fetchUnreadNotificationCount, 30000); // Каждые 30 секунд
+            });
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

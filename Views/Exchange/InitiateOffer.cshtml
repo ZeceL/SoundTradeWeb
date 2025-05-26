@@ -1,0 +1,67 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.InitiateExchangeViewModel
+@{
+    ViewData["Title"] = "Предложение обмена";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-form-container" style="max-width: 700px;">
+    <h2 style="text-align:center; color:#eee; margin-bottom:20px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.1); color: #f1aeb5; border-color: rgba(220, 53, 69, 0.2);">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); color: #ffe187; border-color: rgba(255, 193, 7, 0.2);">@TempData["WarningMessage"]</div>
+    }
+
+
+    <div style="background-color: #2c2c2c; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h4 style="color:#ddd; margin-bottom:10px;">Вы хотите получить трек:</h4>
+        <p style="color:#bbb; font-size:1.1em;">
+            <strong>Название:</strong> @Model.RequestedTrackTitle <br />
+            <strong>Исполнитель:</strong> @Model.RequestedTrackArtistName
+        </p>
+    </div>
+
+    @if (Model.AvailableTracksToOffer.Count > 1) // Больше 1, т.к. первый элемент "--Выберите--"
+    {
+        <form asp-action="SubmitOffer" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RequestedTrackId" />
+            <input type="hidden" asp-for="RequestedTrackTitle" /> @* Для передачи обратно в случае ошибки *@
+            <input type="hidden" asp-for="RequestedTrackArtistName" />@* Для передачи обратно в случае ошибки *@
+            <input type="hidden" asp-for="RequestedTrackOwnerId" />
+
+            <div class="form-group mb-3">
+                <label asp-for="OfferedTrackId" class="control-label" style="color:#ccc;"></label>
+                <select asp-for="OfferedTrackId" asp-items="@Model.AvailableTracksToOffer" class="form-control"></select>
+                <span asp-validation-for="OfferedTrackId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4 d-grid">
+                <button type="submit" class="btn btn-primary btn-block">Отправить предложение обмена</button>
+            </div>
+             <div class="mt-3 text-center">
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-link" style="color:#aaa;">Отмена</a>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-info" style="background-color: rgba(23, 162, 184, 0.1); color: #a6e1ec; border-color: rgba(23, 162, 184, 0.2);">
+            У вас нет доступных треков для предложения обмена на этот трек.
+        </div>
+        <div class="mt-3 text-center">
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-secondary">Вернуться в каталог</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

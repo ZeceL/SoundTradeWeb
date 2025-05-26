@@ -1,0 +1,115 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.ViewExchangeOfferViewModel
+@{
+    ViewData["Title"] = "Просмотр Предложения Обмена";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+    bool isRecipient = Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Pending && currentUserId == Model.RecipientUserId;
+    bool isInitiatorViewingAccepted = Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Accepted && currentUserId == Model.InitiatorUserId;
+    bool isInitiatorViewingDeclined = Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Declined && currentUserId == Model.InitiatorUserId;
+}
+
+<div class="account-form-container" style="max-width: 800px;">
+    <h2 style="text-align:center; color:#eee; margin-bottom:20px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["InfoMessage"]</div>
+    }
+
+    <div class="exchange-offer-details" style="background-color: #2a2a2a; padding: 25px; border-radius: 8px; color: #ddd;">
+        <p style="color:#aaa; margin-bottom:15px;">Предложение от: <strong>@Model.InitiatorUsername</strong> (ID: @Model.InitiatorUserId)</p>
+        <p style="color:#aaa; margin-bottom:20px;">Дата предложения: @Model.OfferDate.ToString("dd.MM.yyyy HH:mm")</p>
+
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin-bottom:25px;">
+            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px;">
+                <h5 style="color:#00c292; margin-bottom:10px;">Предлагаемый трек (от @Model.InitiatorUsername):</h5>
+                <p><strong>Название:</strong> @Model.OfferedTrackTitle</p>
+                <p><strong>Исполнитель:</strong> @Model.OfferedTrackArtistName</p>
+                @if (!string.IsNullOrEmpty(Model.OfferedTrackAudioUrl))
+                {
+                    <button class="play-song-btn profile-play-btn"
+                            data-song-url="@Model.OfferedTrackAudioUrl"
+                            data-title="@Model.OfferedTrackTitle"
+                            data-artist="@Model.OfferedTrackArtistName"
+                            style="margin-top:10px;">
+                        ▶ Слушать
+                    </button>
+                }
+            </div>
+
+            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px;">
+                <h5 style="color:#f39c12; margin-bottom:10px;">Ваш трек (запрашиваемый):</h5>
+                <p><strong>Название:</strong> @Model.RequestedTrackTitle</p>
+                <p><strong>Исполнитель:</strong> @Model.RequestedTrackArtistName</p>
+                @if (!string.IsNullOrEmpty(Model.RequestedTrackAudioUrl))
+                {
+                    <button class="play-song-btn profile-play-btn"
+                            data-song-url="@Model.RequestedTrackAudioUrl"
+                            data-title="@Model.RequestedTrackTitle"
+                            data-artist="@Model.RequestedTrackArtistName"
+                            style="margin-top:10px;">
+                        ▶ Слушать
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div style="margin-top:25px; text-align: center;">
+            <h4 style="color:#eee; margin-bottom:15px;">
+                Статус предложения:
+                @if (Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Pending)
+                {
+                    <span style="color:#ffc107;">Ожидает вашего ответа</span>
+                }
+                @if (Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Accepted)
+                {
+                    <span style="color:#28a745;">Принято (@Model.ResponseDate?.ToString("dd.MM.yyyy HH:mm"))</span>
+                }
+                @if (Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Declined)
+                {
+                    <span style="color:#dc3545;">Отклонено (@Model.ResponseDate?.ToString("dd.MM.yyyy HH:mm"))</span>
+                }
+                @if (Model.Status == SoundTradeWebApp.Enums.ExchangeStatus.Cancelled)
+                {
+                    <span style="color:#6c757d;">Отменено</span>
+                }
+            </h4>
+
+            @if (Model.CanRespond) // Отображаем кнопки только если текущий пользователь - получатель и статус Pending
+            {
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                    <form asp-action="AcceptOffer" asp-route-offerId="@Model.OfferId" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success btn-lg" style="padding: 10px 30px;">Принять обмен</button>
+                    </form>
+                    <form asp-action="DeclineOffer" asp-route-offerId="@Model.OfferId" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-lg" style="padding: 10px 30px;">Отклонить</button>
+                    </form>
+                </div>
+            }
+            else if (isInitiatorViewingAccepted)
+            {
+                <p style="color:#28a745;">Ваше предложение было принято! Треки обменены.</p>
+            }
+            else if (isInitiatorViewingDeclined)
+            {
+                <p style="color:#dc3545;">Ваше предложение было отклонено.</p>
+            }
+        </div>
+
+        <div class="mt-4 text-center">
+            <a asp-controller="Notification" asp-action="Index" class="btn btn-link" style="color:#aaa;">Назад к уведомлениям</a>
+        </div>
+    </div>
+</div>
+@* Код для плеера должен быть в глобальном script.js или в _Layout.cshtml *@

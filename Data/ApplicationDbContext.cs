@@ -10,7 +10,7 @@ namespace SoundTradeWebApp.Data
         {
         }
 
-        // DbSet представляет таблицу Users в базе данных
+        // DbSet представляет таблицы в базе данных
         public DbSet<User> Users { get; set; }
 
         public DbSet<Track> Tracks { get; set; }
@@ -20,6 +20,10 @@ namespace SoundTradeWebApp.Data
         public DbSet<Auction> Auctions { get; set; }
 
         public DbSet<Bid> Bids { get; set; }
+
+        public DbSet<ExchangeOffer> ExchangeOffers { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,6 +90,38 @@ namespace SoundTradeWebApp.Data
                  .HasForeignKey(b => b.AuctionId)
                  .OnDelete(DeleteBehavior.Cascade); // Удалить ставки при удалении аукциона
 
+            // Конфигурация для ExchangeOffer
+            modelBuilder.Entity<ExchangeOffer>()
+                .HasOne(eo => eo.Initiator)
+                .WithMany() // У пользователя может быть много инициированных обменов
+                .HasForeignKey(eo => eo.InitiatorUserId)
+                .OnDelete(DeleteBehavior.Restrict); // Или Cascade, если нужно удалять обмены при удалении пользователя
+
+            modelBuilder.Entity<ExchangeOffer>()
+                .HasOne(eo => eo.OfferedTrack)
+                .WithMany() // У трека может быть много предложений (как OfferedTrack)
+                .HasForeignKey(eo => eo.OfferedTrackId)
+                .OnDelete(DeleteBehavior.Restrict); // Или Cascade
+
+            modelBuilder.Entity<ExchangeOffer>()
+                .HasOne(eo => eo.Recipient)
+                .WithMany()
+                .HasForeignKey(eo => eo.RecipientUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ExchangeOffer>()
+                .HasOne(eo => eo.RequestedTrack)
+                .WithMany()
+                .HasForeignKey(eo => eo.RequestedTrackId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // Конфигурация для Notification
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Recipient)
+                .WithMany() // У пользователя может быть много уведомлений
+                .HasForeignKey(n => n.RecipientUserId)
+                .OnDelete(DeleteBehavior.Cascade); // Удалять уведомления пользователя при удалении самого пользователя
 
             // --- Ваши существующие конфигурации индексов для User ---
             modelBuilder.Entity<User>()

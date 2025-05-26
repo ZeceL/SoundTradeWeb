@@ -70,7 +70,8 @@ namespace SoundTradeWebApp.Controllers
                                             Mood = t.Mood,
                                             Lyrics = t.Lyrics,
                                             AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? "",
-                                            UploadDate = t.UploadDate
+                                            UploadDate = t.UploadDate,
+                                            AuthorUserId = t.AuthorUserId
                                         })
                                         .ToListAsync();
             _logger.LogInformation("Found {Count} tracks matching criteria.", filteredTracks.Count);

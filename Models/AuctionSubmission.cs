@@ -1,4 +1,4 @@
-﻿using SoundTradeWebApp.Enums; // Подключаем наш enum
+﻿using SoundTradeWebApp.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

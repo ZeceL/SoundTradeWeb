@@ -58,16 +58,17 @@ namespace SoundTradeWebApp.Services
                             if (!isAuctionActive) // Блок для ЗАПУСКА аукциона
                             {
                                 scopedLogger.LogInformation("Активный аукцион не найден. Поиск заявок...");
-                                // pendingSubmissions объявлена ЗДЕСЬ
+                                // Объявление pendingSubmissions
                                 var pendingSubmissions = await dbContext.AuctionSubmissions
                                     .Where(s => s.Status == AuctionStatus.Pending)
                                     .ToListAsync(stoppingToken);
 
+
                                 if (pendingSubmissions.Any()) // Используем pendingSubmissions ЗДЕСЬ
                                 {
-                                    scopedLogger.LogInformation("Найдено {Count} ожидающих заявок. Выбор случайной...", pendingSubmissions.Count); // Используем pendingSubmissions ЗДЕСЬ
-                                    int randomIndex = Random.Shared.Next(pendingSubmissions.Count); // Используем pendingSubmissions ЗДЕСЬ
-                                    var selectedSubmission = pendingSubmissions[randomIndex]; // Используем pendingSubmissions ЗДЕСЬ
+                                    scopedLogger.LogInformation("Найдено {Count} ожидающих заявок. Выбор случайной...", pendingSubmissions.Count); // Использование pendingSubmissions
+                                    int randomIndex = Random.Shared.Next(pendingSubmissions.Count); // Использование pendingSubmissions
+                                    var selectedSubmission = pendingSubmissions[randomIndex]; // Использование pendingSubmissions
 
                                     // Загружаем трек ВМЕСТО AnyAsync
                                     var trackToAuction = await dbContext.Tracks
