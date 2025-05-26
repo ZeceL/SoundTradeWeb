@@ -1,0 +1,88 @@
+﻿@model SoundTradeWebApp.Models.ViewModels.ConfirmPurchaseViewModel
+@{
+    ViewData["Title"] = "Подтверждение покупки трека";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="account-form-container" style="max-width: 700px;">
+    @* [cite: 120] *@
+    <h2 style="text-align:center; color:#eee; margin-bottom:20px;">@ViewData["Title"]</h2>
+    <hr style="border-color: #444; margin-bottom: 25px;" /> @* [cite: 121] *@
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.1); color: #f1aeb5; border-color: rgba(220, 53, 69, 0.2);">@TempData["ErrorMessage"]</div> @* [cite: 121] *@
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning" style="background-color: rgba(255, 193, 7, 0.1); color: #ffe187; border-color: rgba(255, 193, 7, 0.2);">@TempData["WarningMessage"]</div> @* [cite: 121] *@
+    }
+    @if (TempData["SuccessMessage"] != null) // Для отображения общего успеха, если сюда перенаправят
+    {
+        <div class="alert alert-success" style="background-color: rgba(40, 167, 69, 0.1); color: #a8dbb6; border-color: rgba(40, 167, 69, 0.2);">@TempData["SuccessMessage"]</div>
+    }
+
+
+    @if (Model != null && Model.TrackId > 0)
+    {
+        <div style="background-color: #2c2c2c; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+            <h4 style="color:#ddd; margin-bottom:15px;">Вы собираетесь приобрести трек:</h4>
+            <p style="color:#bbb; font-size:1.1em; line-height:1.8;">
+                <strong>Название:</strong> @Model.Title <br />
+                <strong>Текущий автор:</strong> @Model.ArtistName <br />
+                @if (!string.IsNullOrEmpty(Model.Genre))
+                {
+                    <span><strong>Жанр:</strong> @Model.Genre <br /></span>
+                }
+                @if (!string.IsNullOrEmpty(Model.VocalType))
+                {
+                    <span><strong>Тип вокала:</strong> @Model.VocalType <br /></span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Mood))
+                {
+                    <span><strong>Настроение:</strong> @Model.Mood <br /></span>
+                }
+            </p>
+            <p style="color:#ccc; margin-top:15px; font-size:0.9em;">
+                После подтверждения трек будет добавлен в вашу коллекцию, а его автором станете вы.
+            </p>
+        </div>
+
+        <form asp-controller="Purchase" asp-action="CompletePurchase" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="TrackId" />
+            @* Можно передать и другие поля модели, если они нужны при ошибке ModelState и возврате на эту же страницу *@
+            <input type="hidden" asp-for="Title" />
+            <input type="hidden" asp-for="ArtistName" />
+            <input type="hidden" asp-for="Genre" />
+            <input type="hidden" asp-for="VocalType" />
+            <input type="hidden" asp-for="Mood" />
+
+
+            <div class="form-group mt-4 d-grid">
+                @* [cite: 125] *@
+                <button type="submit" class="btn btn-primary btn-block" style="background-color: #4CAF50; border-color: #4CAF50;">Подтвердить покупку и Оплатить</button> @* [cite: 106] *@
+            </div>
+            <div class="mt-3 text-center">
+                @* [cite: 125] *@
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-link" style="color:#aaa;">Отмена</a>
+            </div>
+        </form>
+    }
+    else if (TempData["ErrorMessage"] == null && TempData["WarningMessage"] == null) // Если модель пуста и нет других ошибок
+    {
+        <div class="alert alert-info" style="background-color: rgba(23, 162, 184, 0.1); color: #a6e1ec; border-color: rgba(23, 162, 184, 0.2);">
+            Информация о треке для покупки не найдена.
+        </div>
+        <div class="mt-3 text-center">
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-secondary">Вернуться в каталог</a>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -14,6 +14,10 @@
         AuctionItemSold,          // Ваш трек продан на аукционе
         AuctionFinishedNoBids,    // Аукцион по вашему треку завершился без ставок
 
+        // Для покупки
+        TrackSold,
+        TrackPurchased,
+
         // Другие (например, системные сообщения)
         SystemMessage
     }

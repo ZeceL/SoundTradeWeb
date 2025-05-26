@@ -76,7 +76,10 @@
                             </a>
                         }
                     }
-                     <button class="buy-btn" data-song-id="@track.Id">Купить</button>
+                    <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                       class="btn btn-success" style="margin-top: 10px; margin-left: 5px; background-color: #28a745; border-color: #28a745; color:white;">
+                        Купить
+                    </a>
                 </div>
             }
         }
