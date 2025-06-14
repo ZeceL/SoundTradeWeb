@@ -40,6 +40,7 @@ namespace SoundTradeWebApp.Controllers
                                             Title = t.Title,
                                             ArtistName = t.ArtistName,
                                             Genre = t.Genre,
+                                            AuthorUserId = t.AuthorUserId,
                                             // Генерируем URL для воспроизведения
                                             AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                             // Остальные поля (VocalType, Mood, Lyrics, UploadDate) можно добавить, если они нужны на главной
@@ -58,6 +59,7 @@ namespace SoundTradeWebApp.Controllers
                                         Title = t.Title,
                                         ArtistName = t.ArtistName,
                                         Genre = t.Genre,
+                                        AuthorUserId = t.AuthorUserId,
                                         AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                     })
                                     .ToListAsync();
@@ -74,6 +76,7 @@ namespace SoundTradeWebApp.Controllers
                                         Title = t.Title,
                                         ArtistName = t.ArtistName,
                                         Genre = t.Genre,
+                                        AuthorUserId = t.AuthorUserId,
                                         AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                     })
                                     .ToListAsync();
@@ -90,6 +93,7 @@ namespace SoundTradeWebApp.Controllers
                                             Title = t.Title,
                                             ArtistName = t.ArtistName,
                                             Genre = t.Genre,
+                                            AuthorUserId = t.AuthorUserId,
                                             AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                         })
                                         .ToListAsync();
@@ -106,6 +110,7 @@ namespace SoundTradeWebApp.Controllers
                                         Title = t.Title,
                                         ArtistName = t.ArtistName,
                                         Genre = t.Genre,
+                                        AuthorUserId = t.AuthorUserId,
                                         AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                     })
                                     .ToListAsync();
@@ -122,6 +127,7 @@ namespace SoundTradeWebApp.Controllers
                                                 Title = t.Title,
                                                 ArtistName = t.ArtistName,
                                                 Genre = t.Genre,
+                                                AuthorUserId = t.AuthorUserId,
                                                 AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = t.Id }) ?? ""
                                             })
                                             .ToListAsync();

@@ -19,7 +19,7 @@
         <div class="song-list-detailed">
             @foreach (var track in Model.RecommendedTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -28,7 +28,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -48,7 +69,7 @@
             @* Используем тот же класс для стилизации *@
             @foreach (var track in Model.PopTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -57,7 +78,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -77,7 +119,7 @@
             @* Используем тот же класс для стилизации *@
             @foreach (var track in Model.RockTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -86,7 +128,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -106,7 +169,7 @@
             @* Используем тот же класс для стилизации *@
             @foreach (var track in Model.HipHopTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -115,7 +178,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -135,7 +219,7 @@
             @* Используем тот же класс для стилизации *@
             @foreach (var track in Model.JazzTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -144,7 +228,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -164,7 +269,7 @@
             @* Используем тот же класс для стилизации *@
             @foreach (var track in Model.ElectronicTracks)
             {
-                <div class="song-item" data-track-id="@track.Id" style="background: #222; color: #ccc; padding: 15px; width: 90%; max-width: 600px; margin-bottom: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <div class="song-item" data-track-id="@track.Id">
                     <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
                     <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
@@ -173,7 +278,28 @@
                             <span style="margin-right: 10px;">Жанр: @track.Genre</span>
                         }
                     </p>
-                    <button class="play-song-btn" data-song-url="@track.AudioFilePath" style="padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">Слушать</button>
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -197,42 +323,88 @@
                 border-radius: 4px;
             }
 
-        /* --- Стиль для контейнера рекомендованных треков (CSS Grid) --- */
+        /* --- Стиль для контейнера треков (CSS Grid) --- */
         .song-list-detailed {
             display: grid; /* Используем Grid Layout */
             grid-template-columns: repeat(2, 1fr); /* Создаем 2 колонки равной ширины (1fr) */
             gap: 35px; /* Пространство между колонками и рядами */
             margin-top: 15px;
-            padding-left: 150px; /* <---- ДОБАВЛЕН ОТСТУП СЛЕВА */
-            padding-right: 10px; /* Оставляем небольшой отступ справа, если нужно */
+            padding-right: 10px;
         }
 
             /* Стили для .song-item внутри грида */
             .song-list-detailed .song-item {
-                /* width: 100%; */ /* Уже установлено inline, но можно и здесь */
-                box-sizing: border-box; /* Чтобы padding учитывался в ширине */
-                /* Можно добавить другие стили для элементов внутри грида */
+                background: #222;
+                color: #ccc;
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                box-sizing: border-box;
                 transition: transform 0.2s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
                 .song-list-detailed .song-item:hover {
-                    transform: translateY(-3px); /* Небольшой эффект при наведении */
+                    transform: translateY(-3px);
                 }
 
-                .song-list-detailed .song-item button:hover {
-                    filter: brightness(1.1);
+                /* Контейнер для кнопок */
+                .song-list-detailed .song-item .song-item-actions {
+                    margin-top: 15px; /* Отступ сверху для кнопок */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px; /* Расстояние между кнопками */
+                    flex-wrap: wrap;
                 }
+
+                /* Общие стили для кнопок и ссылок-кнопок на главной */
+                .song-list-detailed .song-item button,
+                .song-list-detailed .song-item .btn-action {
+                    padding: 8px 15px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                    transition: filter 0.2s, transform 0.2s;
+                }
+
+                .song-list-detailed .song-item .play-song-btn {
+                    background-color: #4CAF50;
+                }
+                /* Зеленый */
+                .song-list-detailed .song-item .offer-btn {
+                    background-color: #007BFF;
+                }
+                /* Синий */
+                .song-list-detailed .song-item .buy-btn {
+                    background-color: #6f42c1;
+                }
+                /* Фиолетовый */
+
+                .song-list-detailed .song-item button:hover,
+                .song-list-detailed .song-item .btn-action:hover {
+                    filter: brightness(1.15);
+                    transform: scale(1.05);
+                }
+
 
         /* --- Адаптивность (пример): для маленьких экранов делаем 1 колонку --- */
         @@media (max-width: 768px) {
             .song-list-detailed {
                 grid-template-columns: 1fr; /* Одна колонка на маленьких экранах */
-                padding: 0; /* Убираем боковые отступы */
+                padding: 0;
             }
 
                 .song-list-detailed .song-item {
                     width: 95%; /* Чуть меньше ширины экрана */
-                    margin: 0 auto 15px auto; /* Центрируем и добавляем отступ снизу */
+                    margin: 0 auto 15px auto;
                 }
         }
     </style>

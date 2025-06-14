@@ -17,7 +17,7 @@
             <label asp-for="SearchString" class="visually-hidden">Поиск</label>
             @* Поле ввода с классом search-input *@
             <input type="text" asp-for="SearchString" placeholder="Поиск по названию или автору..." class="form-control search-input" />
-            <button type="submit" class="btn btn-search">Поиск</button>
+            <button type="submit" class="btn btn-search" style="margin-left: 10px; background-color: #007BFF;">Поиск</button>
         </form>
 
         @* --- Форма Фильтров (с классом filter-form) --- *@
@@ -38,50 +38,61 @@
                 <select asp-for="SelectedMood" asp-items="@Model.AvailableMoods" class="form-control filter-select"></select>
             </div>
             <div>
-                <button type="submit" class="btn btn-filter">Применить фильтры</button>
-                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary" style="margin-left: 10px; background-color: #6c757d; border-color: #6c757d; color:white;">Сбросить все</a>
+                <button type="submit" class="btn btn-filter" style="margin-left: 10px; background-color: #007BFF;">Применить фильтры</button>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary" style="margin-left: 10px; background-color: #DC3545; border-color: #6c757d; color:white;">Сбросить все</a>
             </div>
         </form>
     </div>
     @* --- Список Песен --- *@
-    <div class="song-list">
+    <div class="song-section">
         @if (!Model.Tracks.Any()) @* <--- Используем Model.Tracks *@
         {
             <p style="color: #ccc;">Треки, соответствующие фильтрам, не найдены.</p>
         }
         else
         {
+            <div class="song-list-detailed">
             @foreach (var track in Model.Tracks) @* <--- Используем Model.Tracks *@
             {
                 <div class="song-item" data-track-id="@track.Id">
                     <h3>@Html.DisplayFor(modelItem => track.Title)</h3>
                     <p>@Html.DisplayFor(modelItem => track.ArtistName)</p>
-                     <p style="font-size: 0.9em; color: #aaa;">
-                        @if (!string.IsNullOrEmpty(track.Genre)) { <span style="margin-right: 10px;">Жанр: @track.Genre</span> }
-                        @if (!string.IsNullOrEmpty(track.VocalType)) { <span>Вокал: @track.VocalType</span> }
+                    <p style="font-size: 0.9em; color: #aaa;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                        @if (!string.IsNullOrEmpty(track.VocalType))
+                        {
+                            <span>Вокал: @track.VocalType</span>
+                        }
                         @* TODO: Отобразить Mood, если нужно *@
                     </p>
-                     @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
-                     <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                        int.TryParse(currentUserIdString, out int currentUserId);
-
-                        @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                    <div class="song-item-actions">
+                        @* Используем track.AudioFilePath, который теперь содержит URL к действию *@
+                        <button class="play-song-btn" data-song-url="@track.AudioFilePath">Слушать</button>
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
-                               class="btn btn-info" style="margin-top: 10px; margin-left: 5px; background-color: #17a2b8; border-color: #17a2b8;">
-                                Предложить обмен
-                            </a>
+                            var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            int.TryParse(currentUserIdString, out int currentUserId);
+
+                            @if (track.AuthorUserId != currentUserId) // Не показывать кнопку для своих треков
+                            {
+                                <a asp-controller="Exchange" asp-action="InitiateOffer" asp-route-requestedTrackId="@track.Id"
+                                   class="btn-action offer-btn">
+                                    Предложить обмен
+                                </a>
+
+                                <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
+                                   class="btn-action buy-btn">
+                                    Купить
+                                </a>
+                            }
                         }
-                    }
-                    <a asp-controller="Purchase" asp-action="Confirm" asp-route-trackId="@track.Id"
-                       class="btn btn-success" style="margin-top: 10px; margin-left: 5px; background-color: #28a745; border-color: #28a745; color:white;">
-                        Купить
-                    </a>
+                    </div>
                 </div>
             }
+            </div>
         }
     </div>
 
@@ -103,8 +114,8 @@
                         @* --- Новая Кнопка "Слушать" --- *@
                         <button class="play-song-btn"
                                 data-song-url="@track.AudioFilePath"
-                                data-title="@track.Title" @* Передаем название в data-атрибуте *@
-                                data-artist="@track.ArtistName" @* Передаем исполнителя в data-атрибуте *@
+                                data-title="@track.Title" @* Передаем название в data-атрибуте *@ 
+                                data-artist="@track.ArtistName" @* Передаем исполнителя в data-атрибуте *@ 
                                 style="padding: 5px 10px; font-size: 0.9em; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; line-height: 1;">
                             Слушать
                         </button>
@@ -119,19 +130,18 @@
 @* --- Секция Стилей --- *@
 @section Styles {
     <style>
-        /* --- Стили для контейнера списка треков в каталоге (2 колонки, слева) --- */
-        .catalog-page-content .song-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-            max-width: 100%;
-            margin-left: 0;
-            margin-right: 0;
+        
+        /* --- Стиль для контейнера треков (CSS Grid) --- */
+        .song-list-detailed {
+            display: grid; /* Используем Grid Layout */
+            grid-template-columns: repeat(2, 1fr); /* Создаем 2 колонки равной ширины (1fr) */
+            gap: 35px; /* Пространство между колонками и рядами */
+            margin-top: 15px;
+            padding-right: 10px;
         }
 
-            .catalog-page-content .song-list .song-item { /* ... стили как в предыдущем ответе ... */
-                width: 100%;
+            /* Стили для .song-item внутри грида */
+            .song-list-detailed .song-item {
                 background: #222;
                 color: #ccc;
                 padding: 15px;
@@ -139,50 +149,57 @@
                 text-align: center;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
                 box-sizing: border-box;
-                margin-bottom: 0;
-                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                transition: transform 0.2s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
-                .catalog-page-content .song-list .song-item:hover {
+                .song-list-detailed .song-item:hover {
                     transform: translateY(-3px);
-                    box-shadow: 0px 6px 12px rgba(0,0,0,0.4);
                 }
 
-                .catalog-page-content .song-list .song-item h3 {
-                    color: #eee;
-                    margin-bottom: 5px;
-                    font-size: 1.1em;
+                /* Контейнер для кнопок */
+                .song-list-detailed .song-item .song-item-actions {
+                    margin-top: 15px; /* Отступ сверху для кнопок */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px; /* Расстояние между кнопками */
+                    flex-wrap: wrap;
                 }
 
-                .catalog-page-content .song-list .song-item p {
-                    color: #aaa;
-                    margin-bottom: 10px;
+                /* Общие стили для кнопок и ссылок-кнопок на главной */
+                .song-list-detailed .song-item button,
+                .song-list-detailed .song-item .btn-action {
+                    padding: 8px 15px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
                     font-size: 0.9em;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                    transition: filter 0.2s, transform 0.2s;
                 }
 
-                .catalog-page-content .song-list .song-item button.play-song-btn {
-                    padding: 8px 15px;
+                .song-list-detailed .song-item .play-song-btn {
                     background-color: #4CAF50;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    margin-top: 10px;
                 }
-
-                .catalog-page-content .song-list .song-item button.buy-btn {
-                    padding: 8px 15px;
+                /* Зеленый */
+                .song-list-detailed .song-item .offer-btn {
                     background-color: #007BFF;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    margin-top: 10px;
-                    margin-left: 10px;
                 }
+                /* Синий */
+                .song-list-detailed .song-item .buy-btn {
+                    background-color: #6f42c1;
+                }
+                /* Фиолетовый */
 
-                .catalog-page-content .song-list .song-item button:hover {
-                    filter: brightness(1.1);
+                .song-list-detailed .song-item button:hover,
+                .song-list-detailed .song-item .btn-action:hover {
+                    filter: brightness(1.15);
+                    transform: scale(1.05);
                 }
 
         @@media (max-width: 768px) {
@@ -203,11 +220,11 @@
 
         /* --- НОВЫЕ СТИЛИ ДЛЯ ФИЛЬТРОВ И ПОИСКА (в одну строку) --- */
         .filter-controls {
-            display: flex; /* Главный контейнер делаем flex */
-            flex-direction: row; /* Элементы (формы) в строку */
-            flex-wrap: wrap; /* Разрешаем перенос на новую строку */
-            align-items: center; /* Выравнивание по центру по вертикали */
-            gap: 15px; /* Отступ между формой поиска и формой фильтров */
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
             background-color: #252525;
             padding: 10px 15px; /* Уменьшили вертикальный padding */
             border-radius: 8px;
@@ -219,8 +236,6 @@
                 display: flex;
                 align-items: center;
                 gap: 8px; /* Небольшой отступ между полем и кнопкой поиска */
-                /* flex-grow: 0; */ /* Поиск не будет растягиваться, если фильтры справа */
-                /* margin-right: 15px; /* Отступ до блока фильтров, если gap у родителя недостаточен, можно убрать если gap родителя >= 15px */
             }
             /* Поле поиска */
             .filter-controls .search-input {
@@ -232,34 +247,28 @@
                 display: flex;
                 align-items: center;
                 flex-wrap: wrap; /* Разрешаем перенос фильтров */
-                gap: 8px; /* Небольшой отступ между элементами фильтров */
-                flex-grow: 1; /* Форма фильтров займет оставшееся место */
-                justify-content: flex-start; /* Фильтры начинаются слева */
+                gap: 8px;
+                flex-grow: 1;
+                justify-content: flex-start;
             }
                 /* Обертка для каждого select/button внутри формы фильтров */
                 .filter-controls .filter-form div {
-                    /* flex-grow: 1; */ /* Убираем, чтобы select-ы не растягивались слишком сильно */
                     margin-bottom: 0; /* Убираем лишние отступы, если были */
                 }
 
                 .filter-controls .filter-form select.form-control {
                     min-width: 130px; /* Минимальная ширина для select */
                 }
-                /* Кнопка "Применить фильтры" */
-                .filter-controls .filter-form div:last-child {
-                    /* margin-left: auto; */ /* Убираем прижатие кнопки фильтров вправо, пусть идет по потоку */
-                }
-
 
             /* Общие стили для полей ввода и выпадающих списков в этом блоке */
             .filter-controls .form-control {
-                padding: 6px 10px; /* Уменьшили padding для компактности */
-                border-radius: 4px; /* Чуть меньше скругление */
+                padding: 6px 10px;
+                border-radius: 4px;
                 border: 1px solid #555;
                 background: #333;
                 color: white;
                 font-size: 0.9em; /* Уменьшили шрифт */
-                height: 34px; /* Уменьшили высоту */
+                height: 34px;
                 box-sizing: border-box;
                 line-height: normal;
             }
@@ -272,12 +281,12 @@
 
             /* Стили для кнопок в этом блоке */
             .filter-controls .btn {
-                padding: 6px 12px; /* Уменьшили padding */
+                padding: 6px 12px;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 0.9em; /* Уменьшили шрифт */
-                height: 34px; /* Уменьшили высоту */
+                height: 34px;
                 transition: background-color 0.2s, transform 0.1s;
                 white-space: nowrap;
                 color: white;
@@ -314,29 +323,28 @@
         /* Адаптивность для фильтров и поиска */
         @@media (max-width: 768px) {
             .filter-controls {
-                flex-direction: column; /* Все формы друг под другом */
-                align-items: stretch; /* Формы растягиваются по ширине */
-                gap: 15px; /* Вертикальный отступ между формами */
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
             }
 
                 .filter-controls .search-form {
-                    margin-right: 0; /* Убираем правый отступ */
+                    margin-right: 0;
                     width: 100%;
                 }
 
                 .filter-controls .search-input {
-                    flex-grow: 1; /* Поле поиска растягивается */
-                    width: auto; /* Автоматическая ширина */
+                    flex-grow: 1;
+                    width: auto;
                 }
 
                 .filter-controls .filter-form {
                     width: 100%;
-                    /* Можно добавить justify-content: space-between; если элементов много */
                 }
 
                     .filter-controls .filter-form div {
-                        flex-grow: 1; /* Фильтры могут растягиваться */
-                        min-width: 120px; /* Минимальная ширина для фильтров */
+                        flex-grow: 1;
+                        min-width: 120px;
                     }
 
                         .filter-controls .filter-form div:last-child { /* Кнопка фильтров */
@@ -346,9 +354,9 @@
 
         /* Стили для lyrics-list (для отображения в одну колонку) */
         .catalog-page-content .lyrics-list {
-            display: none; /* По умолчанию скрыт */
+            display: none;
             flex-direction: column;
-            align-items: center; /* Центрируем элементы .lyrics-item */
+            align-items: center;
             gap: 20px;
             margin-top: 20px;
         }
@@ -403,61 +411,52 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("Catalog page Scripts section loaded.");
-
+            // 1. Находим все необходимые элементы управления
             const toggleButton = document.getElementById('toggleContent');
-            const songList = document.querySelector('.catalog-page-content .song-list');
-            const lyricsList = document.querySelector('.catalog-page-content .lyrics-list');
-            const filterControls = document.querySelector('.catalog-page-content .filter-controls');
+            const songSection = document.querySelector('.song-section'); // Правильный селектор для контейнера песен
+            const lyricsList = document.querySelector('.lyrics-list');
+            const filterControls = document.querySelector('.filter-controls');
 
-            console.log("ToggleButton:", toggleButton);
-            console.log("SongList:", songList);
-            console.log("LyricsList:", lyricsList);
-            console.log("FilterControls:", filterControls);
-
-            if (!toggleButton || !songList || !lyricsList || !filterControls) {
-                console.error('ОШИБКА: Не найдены все элементы для переключения контента каталога!');
+            // 2. Проверяем, что все элементы найдены, иначе выходим
+            if (!toggleButton || !songSection || !lyricsList || !filterControls) {
+                console.error('Ошибка: Не удалось найти один или несколько элементов для управления видом каталога.');
                 return;
             }
 
-            // Устанавливаем начальное состояние для lyricsList, если оно не задано CSS
-            if (lyricsList.style.display === "") { // Проверяем, если display не установлен явно
-                lyricsList.style.display = 'none'; // Скрываем список текстов по умолчанию
-            }
+            // 3. Добавляем обработчик клика на кнопку
+            toggleButton.addEventListener('click', function () {
+                // Определяем, видимы ли в данный момент тексты песен
+                const isLyricsVisible = lyricsList.style.display !== 'none';
 
+                if (isLyricsVisible) {
+                    // ЕСЛИ ВИДНЫ ТЕКСТЫ -> ПЕРЕКЛЮЧАЕМ НА ПЕСНИ
 
-            if (toggleButton && songList && lyricsList && filterControls) {
-                // Начальное состояние: если список текстов не имеет display, скрываем его
-                if (lyricsList.style.display === "" && songList.style.display !== 'none') { // Условие, что песни видимы
+                    // Скрываем тексты
                     lyricsList.style.display = 'none';
-                } else if (songList.style.display === "" && lyricsList.style.display !== 'none') { // Условие, что тексты видимы
-                    songList.style.display = 'none';
-                } else if (songList.style.display === "" && lyricsList.style.display === "") { // Если оба не заданы
-                    lyricsList.style.display = 'none'; // Скрываем тексты по умолчанию
-                    songList.style.display = 'grid'; // Показываем песни как grid
+
+                    // Показываем блок с песнями и блок с фильтрами
+                    // Используем 'block' - это стандартное отображение для <div>,
+                    // которое не будет конфликтовать со стилями дочерних элементов.
+                    songSection.style.display = 'block';
+                    filterControls.style.display = 'flex';
+
+                    // Меняем текст на кнопке
+                    toggleButton.textContent = 'Переключить на тексты песен';
+                } else {
+                    // ЕСЛИ ВИДНЫ ПЕСНИ -> ПЕРЕКЛЮЧАЕМ НА ТЕКСТЫ
+
+                    // Скрываем блок с песнями и фильтры
+                    songSection.style.display = 'none';
+                    filterControls.style.display = 'none';
+
+                    // Показываем тексты. Используем 'flex', так как в ваших стилях
+                    // для .lyrics-list указан 'display: flex'
+                    lyricsList.style.display = 'flex';
+
+                    // Меняем текст на кнопке
+                    toggleButton.textContent = 'Переключить на список песен';
                 }
-
-
-                toggleButton.addEventListener('click', function () {
-                    const isLyricsListVisible = lyricsList.style.display !== 'none';
-
-                    if (isLyricsListVisible) {
-                        lyricsList.style.display = 'none';
-                        songList.style.display = 'grid'; // <--- ВАЖНО: ВОССТАНАВЛИВАЕМ display: grid
-                        filterControls.style.display = 'flex'; // Восстанавливаем отображение фильтров
-                        toggleButton.textContent = 'Переключить на тексты песен';
-                    } else {
-                        lyricsList.style.display = 'flex'; // Для списка текстов можно 'flex' или 'block'
-                        songList.style.display = 'none';
-                        filterControls.style.display = 'none'; // Скрываем фильтры при просмотре текстов
-                        toggleButton.textContent = 'Переключить на список песен';
-                    }
-                });
-            }
-            // --- Код для кнопки Купить (заглушка) ---
-            const buyButtons = document.querySelectorAll('.buy-btn');
-            buyButtons.forEach(button => { button.addEventListener('click', function () { alert(`Покупка трека ${this.dataset.songId} еще не реализована.`); }); });
-
+            });
         });
     </script>
 }

@@ -201,7 +201,6 @@ footer {
 
 .progress-bar {
 	flex-grow: 1;
-	margin: 0 15px;
 }
 
 .volume-container {
@@ -446,7 +445,6 @@ input[type='range'].volume-control {
 			}
 
 	/* Списки песен и текстов в каталоге */
-	.catalog-page-content .song-list,
 	.catalog-page-content .lyrics-list {
 		display: flex; /* Используем flex для элементов списка */
 		flex-direction: column; /* Элементы идут друг под другом */
@@ -454,6 +452,7 @@ input[type='range'].volume-control {
 		gap: 20px; /* Пространство между элементами */
 		margin-top: 20px;
 	}
+
 
 	.catalog-page-content .song-item,
 	.catalog-page-content .lyrics-item {
@@ -492,33 +491,52 @@ input[type='range'].volume-control {
 			overflow-y: auto; /* Добавление скролла, если текст не помещается */
 		}
 
+		
 		/* Кнопки внутри song-item */
-		.catalog-page-content .song-item button {
+		.catalog-page-content .song-item .song-item-actions {
+			margin-top: 15px; /* Отступ сверху для контейнера с кнопками */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 10px; /* Расстояние между кнопками */
+			flex-wrap: wrap; /* Перенос кнопок на новую строку, если не помещаются */
+		}
+
+		.catalog-page-content .song-item button,
+		.catalog-page-content .song-item .btn-action { /* Общий класс для ссылок-кнопок */
 			padding: 8px 15px;
-			margin: 5px;
 			border: none;
 			border-radius: 5px;
 			cursor: pointer;
 			font-size: 0.9em;
-			transition: background-color 0.2s, transform 0.1s;
+			font-weight: bold;
+			text-decoration: none; /* Для ссылок */
+			color: white;
+			transition: background-color 0.2s, transform 0.1s, filter 0.2s;
+			display: inline-block;
+			text-align: center;
 		}
 
 			.catalog-page-content .song-item button.play-song-btn {
 				background-color: #4CAF50; /* Зеленый для "Слушать" */
-				color: white;
 			}
 
-			.catalog-page-content .song-item button.buy-btn {
-				background-color: #007BFF; /* Синий для "Купить" */
-				color: white;
+			.catalog-page-content .song-item .btn-action.offer-btn {
+				background-color: #007BFF; /* Синий для "Предложить обмен" */
 			}
 
-			.catalog-page-content .song-item button:hover {
-				filter: brightness(1.1);
+			.catalog-page-content .song-item .btn-action.buy-btn {
+				background-color: #6f42c1; /* Фиолетовый для "Купить" */
+			}
+
+			.catalog-page-content .song-item button:hover,
+			.catalog-page-content .song-item .btn-action:hover {
+				filter: brightness(1.15);
 				transform: scale(1.05);
 			}
 
-			.catalog-page-content .song-item button:active {
+			.catalog-page-content .song-item button:active,
+			.catalog-page-content .song-item .btn-action:active {
 				transform: scale(0.95);
 			}
 
@@ -720,3 +738,6 @@ input[type='range'].volume-control {
 		margin-bottom: 20px;
 		text-align: center;
 	}
+.play-song-btn {
+	background-color: #4CAF50;
+}

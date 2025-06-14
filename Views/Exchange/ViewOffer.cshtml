@@ -36,13 +36,17 @@
                 <p><strong>Исполнитель:</strong> @Model.OfferedTrackArtistName</p>
                 @if (!string.IsNullOrEmpty(Model.OfferedTrackAudioUrl))
                 {
-                    <button class="play-song-btn profile-play-btn"
-                            data-song-url="@Model.OfferedTrackAudioUrl"
-                            data-title="@Model.OfferedTrackTitle"
-                            data-artist="@Model.OfferedTrackArtistName"
-                            style="margin-top:10px;">
-                        ▶ Слушать
-                    </button>
+                    <div class="song-list-detailed">
+                        <div class="song-item-actions">
+                            <button class="play-song-btn"
+                                    data-song-url="@Model.OfferedTrackAudioUrl"
+                                    data-title="@Model.OfferedTrackTitle"
+                                    data-artist="@Model.OfferedTrackArtistName"
+                                    style="margin-top:10px;">
+                                ▶ Слушать
+                            </button>
+                        </div>
+                    </div>
                 }
             </div>
 
@@ -52,13 +56,17 @@
                 <p><strong>Исполнитель:</strong> @Model.RequestedTrackArtistName</p>
                 @if (!string.IsNullOrEmpty(Model.RequestedTrackAudioUrl))
                 {
-                    <button class="play-song-btn profile-play-btn"
-                            data-song-url="@Model.RequestedTrackAudioUrl"
-                            data-title="@Model.RequestedTrackTitle"
-                            data-artist="@Model.RequestedTrackArtistName"
-                            style="margin-top:10px;">
-                        ▶ Слушать
-                    </button>
+                    <div class="song-list-detailed">
+                        <div class="song-item-actions">
+                            <button class="play-song-btn"
+                                    data-song-url="@Model.OfferedTrackAudioUrl"
+                                    data-title="@Model.OfferedTrackTitle"
+                                    data-artist="@Model.OfferedTrackArtistName"
+                                    style="margin-top:10px;">
+                                ▶ Слушать
+                            </button>
+                        </div>
+                    </div>
                 }
             </div>
         </div>
@@ -112,4 +120,105 @@
         </div>
     </div>
 </div>
-@* Код для плеера должен быть в глобальном script.js или в _Layout.cshtml *@
+@section Styles {
+    <style>
+        /* Стиль для простых списков (остается) */
+        .song-list-simple {
+            list-style: none;
+            padding-left: 0;
+        }
+
+            .song-list-simple li {
+                background: #282828;
+                color: #ccc;
+                padding: 8px 12px;
+                margin-bottom: 5px;
+                border-radius: 4px;
+            }
+
+        /* --- Стиль для контейнера треков (CSS Grid) --- */
+        .song-list-detailed {
+            display: grid; /* Используем Grid Layout */
+            grid-template-columns: repeat(2, 1fr); /* Создаем 2 колонки равной ширины (1fr) */
+            gap: 35px; /* Пространство между колонками и рядами */
+            margin-top: 15px;
+            padding-right: 10px;
+        }
+
+            /* Стили для .song-item внутри грида */
+            .song-list-detailed .song-item {
+                background: #222;
+                color: #ccc;
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                box-sizing: border-box;
+                transition: transform 0.2s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+                .song-list-detailed .song-item:hover {
+                    transform: translateY(-3px);
+                }
+
+                /* Контейнер для кнопок */
+                .song-list-detailed .song-item .song-item-actions {
+                    margin-top: 15px; /* Отступ сверху для кнопок */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px; /* Расстояние между кнопками */
+                    flex-wrap: wrap;
+                }
+
+                /* Общие стили для кнопок и ссылок-кнопок на главной */
+                .song-list-detailed .song-item button,
+                .song-list-detailed .song-item .btn-action {
+                    padding: 8px 15px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                    transition: filter 0.2s, transform 0.2s;
+                }
+
+                .song-list-detailed .song-item .play-song-btn {
+                    background-color: #4CAF50;
+                }
+                /* Зеленый */
+                .song-list-detailed .song-item .offer-btn {
+                    background-color: #007BFF;
+                }
+                /* Синий */
+                .song-list-detailed .song-item .buy-btn {
+                    background-color: #6f42c1;
+                }
+                /* Фиолетовый */
+
+                .song-list-detailed .song-item button:hover,
+                .song-list-detailed .song-item .btn-action:hover {
+                    filter: brightness(1.15);
+                    transform: scale(1.05);
+                }
+
+
+        /* --- Адаптивность (пример): для маленьких экранов делаем 1 колонку --- */
+        @@media (max-width: 768px) {
+            .song-list-detailed {
+                grid-template-columns: 1fr; /* Одна колонка на маленьких экранах */
+                padding: 0;
+            }
+
+                .song-list-detailed .song-item {
+                    width: 95%; /* Чуть меньше ширины экрана */
+                    margin: 0 auto 15px auto;
+                }
+        }
+    </style>
+}
