@@ -24,33 +24,45 @@
     }
     else
     {
-        <table class="table" style="color: #ccc; border-color: #444;">
-            <thead style="color: #eee;">
-                <tr style="border-color: #555 !important;">
-                    <th>Название</th>
-                    <th>Исполнитель</th>
-                    <th>Жанр</th>
-                    <th>Дата загрузки</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr style="border-color: #444 !important;">
-                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.Title)</td>
-                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.ArtistName)</td>
-                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.Genre)</td>
-                        @* Используем DisplayFor, который учтет DisplayFormat из ViewModel *@
-                        <td style="border-color: #444 !important;">@Html.DisplayFor(modelItem => item.UploadDate)</td>
-                        <td style="border-color: #444 !important;">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary" style="background-color: #5a6268; border-color: #5a6268;">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" style="background-color: #dc3545; border-color: #dc3545; margin-left: 5px;">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="song-list-detailed">
+            @* Используем тот же класс, что и на главной для стилизации *@
+            @foreach (var track in Model)
+            {
+                <div class="song-item" data-track-id="@track.Id">
+                    <h3 style="color: #eee; margin-bottom: 5px;">@Html.DisplayFor(modelItem => track.Title)</h3>
+                    <p style="color: #aaa; margin-bottom: 10px;">@Html.DisplayFor(modelItem => track.ArtistName)</p>
+                    <p style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+                        @if (!string.IsNullOrEmpty(track.Genre))
+                        {
+                            <span style="margin-right: 10px;">Жанр: @track.Genre</span>
+                        }
+                        <span>Загружено: @Html.DisplayFor(modelItem => track.UploadDate)</span>
+                    </p>
+                    <div class="song-item-actions">
+                        @* Кнопка "Послушать" для футер-плеера *@
+                        @if (!string.IsNullOrEmpty(track.AudioFilePath))
+                        {
+                            @* Меняем data-audio-src на data-song-url, чтобы соответствовать вашему script.txt *@
+                            <button type="button" class="btn-action play-song-btn"
+                                    data-song-url="@track.AudioFilePath"
+                                    data-song-title="@track.Title"
+                                    data-song-artist="@track.ArtistName"
+                                    style="background-color: #4CAF50;">
+                                Послушать
+                            </button>
+                        }
+                        else
+                        {
+                            <p style="color: #f00;">Аудиофайл недоступен.</p>
+                        }
+
+                        @* Кнопки Редактировать и Удалить *@
+                        <a asp-action="Edit" asp-route-id="@track.Id" class="btn-action edit-btn" style="background-color: #007bff;">Редактировать</a>
+                        <a asp-action="Delete" asp-route-id="@track.Id" class="btn-action delete-btn" style="background-color: #dc3545;">Удалить</a>
+                    </div>
+                </div>
+            }
+        </div>
     }
 </div>
 
@@ -64,16 +76,103 @@
             background-color: #4CAF50 !important; /* Яркий зеленый */
             border-color: #4CAF50 !important;
             color: #fff !important;
-            padding: 6px 12px !important; /* <--- Уменьшены верхний/нижний и левый/правый отступы */
-            font-size: 1em !important; /* Вернем размер шрифта к обычному или настройте по желанию */
-            border-radius: 5px !important; /* Уменьшим скругление, чтобы лучше сочеталось с меньшими отступами */
-            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2) !important; /* Немного уменьшим тень */
-            transition: background-color 0.3s ease !important;
+            padding: 6px 12px !important;
+            font-size: 1em !important;
+            border-radius: 5px !important;
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
         }
 
-            .btn-primary:hover {
-                background-color: #45A049 !important;
-                border-color: #45A049 !important;
+        /* --- Стили для секций треков --- */
+        .song-section {
+            margin-bottom: 40px;
+        }
+
+            .song-section h2 {
+                color: #fff;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #4CAF50;
+                padding-bottom: 10px;
             }
+
+        .song-list-detailed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 2 колонки или больше в зависимости от ширины */
+            gap: 20px; /* Отступы между карточками */
+            padding: 20px;
+        }
+
+            .song-list-detailed .song-item {
+                background-color: #333;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                transition: transform 0.2s ease-in-out;
+            }
+
+                .song-list-detailed .song-item:hover {
+                    transform: translateY(-5px);
+                }
+
+                .song-list-detailed .song-item h3 {
+                    color: #eee;
+                    margin-bottom: 5px;
+                }
+
+                .song-list-detailed .song-item p {
+                    color: #aaa;
+                    margin-bottom: 10px;
+                }
+
+                .song-list-detailed .song-item .audio-player {
+                    width: 100%;
+                    margin-top: 10px;
+                    margin-bottom: 15px;
+                    border-radius: 5px;
+                    background-color: #444;
+                }
+
+                .song-list-detailed .song-item .song-item-actions {
+                    display: flex;
+                    flex-wrap: wrap; /* Для переноса кнопок на новую строку при необходимости */
+                    gap: 10px; /* Отступы между кнопками */
+                    margin-top: auto; /* Прижать кнопки к низу карточки */
+                    justify-content: center; /* Центрировать кнопки */
+                }
+
+                .song-list-detailed .song-item .btn-action {
+                    padding: 10px 15px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 0.9em;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                    transition: filter 0.2s, transform 0.2s;
+                    flex-grow: 1; /* Чтобы кнопки занимали доступное пространство */
+                    text-align: center;
+                }
+
+                    .song-list-detailed .song-item .btn-action:hover {
+                        filter: brightness(1.15);
+                        transform: scale(1.05);
+                    }
+
+        /* --- Адаптивность (пример): для маленьких экранов делаем 1 колонку --- */
+        @@media (max-width: 768px) {
+            .song-list-detailed {
+                grid-template-columns: 1fr; /* Одна колонка на маленьких экранах */
+                padding: 0;
+            }
+
+                .song-list-detailed .song-item {
+                    width: auto; /* Автоматическая ширина на маленьких экранах */
+                    margin: 0 10px; /* Небольшие отступы по бокам */
+                }
+        }
     </style>
 }
+

@@ -36,22 +36,33 @@ namespace SoundTradeWebApp.Controllers
                 return Unauthorized("Не удалось определить пользователя.");
             }
 
-            // Выбираем данные для ViewModel
-            var authorTrackViewModels = await _context.Tracks
-                                           .AsNoTracking()
-                                           .Where(t => t.AuthorUserId == userId)
-                                           .OrderByDescending(t => t.UploadDate)
-                                           .Select(t => new TrackIndexViewModel // Используем ViewModel
-                                           {
-                                               Id = t.Id,
-                                               Title = t.Title,
-                                               ArtistName = t.ArtistName, // Показываем имя, сохраненное в треке
-                                               Genre = t.Genre,
-                                               UploadDate = t.UploadDate
-                                           })
-                                           .ToListAsync();
+            // Выбираем данные для ViewModel (без AudioFilePath пока)
+            var authorTracks = await _context.Tracks
+                .AsNoTracking() // Только для чтения
+                .Where(t => t.AuthorUserId == userId)
+                .Select(t => new TrackIndexViewModel // Выбираем все поля, кроме AudioFilePath
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    ArtistName = t.ArtistName,
+                    Genre = t.Genre,
+                    UploadDate = t.UploadDate,
+                    VocalType = t.VocalType,
+                    Mood = t.Mood,
+                    Lyrics = t.Lyrics,
+                    AuthorUserId = t.AuthorUserId
+                    // AudioFilePath будет добавлен ниже
+                })
+                .ToListAsync();
 
-            return View(authorTrackViewModels);
+            // Теперь, когда данные получены, можем добавить AudioFilePath
+            foreach (var track in authorTracks)
+            {
+                // Генерируем URL для каждого трека
+                track.AudioFilePath = Url.Action("GetAudio", "Tracks", new { id = track.Id }) ?? "";
+            }
+
+            return View(authorTracks);
         }
 
         // GET: /AuthorPanel/Upload - Показывает форму загрузки

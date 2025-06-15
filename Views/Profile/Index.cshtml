@@ -28,99 +28,117 @@
         <p><strong>@Html.DisplayNameFor(model => model.Email):</strong> @Html.DisplayFor(model => model.Email)</p>
     </div>
 
+    @* Кнопка редактирования профиля - ПЕРЕМЕЩЕНА СЮДА и применены новые стили *@
+    <div style="text-align: center; margin-top: 20px; margin-bottom: 30px;">
+        <a asp-action="Edit" class="btn-edit-profile">Редактировать профиль</a>
+    </div>
+
     @* --- Список треков для автора (в 2 колонки) --- *@
     @if (Model.UserType == "Author")
     {
         <hr style="border-color: #444; margin: 25px 0;" />
         <h4 style="color: #bbb; margin-bottom: 15px;">Мои загруженные треки:</h4>
 
-        @if (!Model.UploadedTracks.Any())
+        @if (Model.UploadedTracks == null || !Model.UploadedTracks.Any())
         {
-            <p style="color: #ccc;">Вы еще не загрузили ни одного трека.</p>
+            <p style="color: #aaa; text-align: center;">У вас пока нет загруженных треков.</p>
         }
         else
         {
-            @* Контейнер для сетки *@
-            <div class="profile-track-list">
-                @foreach (var trackInfo in Model.UploadedTracks)
+            <div class="profile-tracks-grid">
+                @foreach (var track in Model.UploadedTracks)
                 {
-                    @* Элемент сетки (трек + кнопка) *@
                     <div class="profile-track-item">
-                        <span title="@trackInfo.Title">@trackInfo.Title</span> @* Название трека (можно добавить title для длинных) *@
-                        <button class="play-song-btn profile-play-btn"
-                                data-song-url="@Url.Action("GetAudio", "Tracks", new { id = trackInfo.Id })"
-                                data-title="@trackInfo.Title"
-                                data-artist="@Model.Username">
-                            @* Используем текущий username профиля *@
-                            ▶ @* Иконка Play (можно заменить на SVG) *@
-                        </button>
+                        <span>@track.Title</span>
+                        <button class="profile-play-btn" data-song-url="@Url.Action("GetAudio", "Tracks", new { id = track.Id })">▶</button>
                     </div>
                 }
             </div>
         }
     }
-    @* --- Конец списка треков --- *@
-
-
-    <hr style="border-color: #444; margin: 25px 0;" />
-
-    @* Кнопка редактирования *@
-    <div style="text-align: center; margin-top: 20px;">
-        <a asp-action="Edit" class="btn btn-secondary" style="background-color: #5a6268; border-color: #5a6268; padding: 10px 20px;">Редактировать профиль</a>
-    </div>
-
 </div>
 
-@* Стили для списка треков *@
+@section Scripts {
+    <script src="~/js/script.js" asp-append-version="true"></script>
+}
+
 @section Styles {
     <style>
-        .profile-track-list {
+        /* Стили для кнопки "Редактировать профиль" */
+        .btn-edit-profile {
+            display: inline-block; /* чтобы можно было задать padding, margin и transform */
+            padding: 12px 28px; /* Достаточно крупные отступы */
+            font-size: 1.1em; /* Увеличиваем размер шрифта */
+            font-weight: 600; /* Полужирный шрифт */
+            color: #fff; /* Белый текст */
+            text-decoration: none; /* Убираем подчеркивание */
+            border-radius: 8px; /* Скругленные углы */
+            background-image: linear-gradient(to right, #007bff, #0056b3); /* Градиент от синего к более темному синему */
+            border: none; /* Убираем стандартную рамку */
+            cursor: pointer; /* Указатель при наведении */
+            transition: all 0.3s ease; /* Плавный переход для всех свойств */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4); /* Мягкая тень */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Небольшая тень для текста */
+        }
+
+            .btn-edit-profile:hover {
+                background-image: linear-gradient(to right, #0056b3, #003d80); /* Изменяем градиент при наведении */
+                box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6); /* Увеличиваем тень */
+                transform: translateY(-2px); /* Слегка поднимаем кнопку */
+            }
+
+            .btn-edit-profile:active {
+                transform: translateY(0); /* Возвращаем кнопку на место при нажатии */
+                box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3); /* Уменьшаем тень при нажатии */
+            }
+
+        /* Существующие стили для списка треков */
+        .profile-tracks-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Две колонки */
-            gap: 10px 20px; /* Отступ между рядами / колонками */
-            padding-left: 0; /* Убираем стандартный отступ списка */
-            list-style: none; /* Убираем маркеры списка */
-            color: #ccc;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .profile-track-item {
-            display: flex; /* Располагаем название и кнопку в строку */
-            justify-content: space-between; /* Разносим их по краям */
-            align-items: center; /* Выравниваем по вертикали */
-            padding: 8px 10px; /* Внутренние отступы */
-            background-color: #333; /* Фон элемента */
-            border-radius: 4px; /* Скругление */
-            overflow: hidden; /* Для обрезки текста, если нужно */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-            .profile-track-item span { /* Название трека */
+            .profile-track-item span {
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis; /* Обрезаем длинные названия */
-                margin-right: 10px; /* Отступ справа от названия */
+                text-overflow: ellipsis;
+                margin-right: 10px;
+                color: #eee; /* Цвет текста названия трека */
             }
 
-
-            .profile-track-item .profile-play-btn { /* Кнопка Play */
-                padding: 3px 8px; /* Маленькие отступы */
-                font-size: 0.8em; /* Маленький шрифт */
+            .profile-track-item .profile-play-btn {
+                padding: 3px 8px;
+                font-size: 0.8em;
                 background-color: #4CAF50;
                 color: white;
                 border: none;
                 border-radius: 3px;
                 cursor: pointer;
                 line-height: 1;
-                flex-shrink: 0; /* Не сжимаем кнопку */
+                flex-shrink: 0;
+                transition: background-color 0.2s ease;
             }
 
                 .profile-track-item .profile-play-btn:hover {
-                    filter: brightness(1.1);
+                    background-color: #45a049; /* Изменение цвета при наведении */
                 }
 
         /* Адаптивность для списка треков */
-        @@media (max-width: 768px) {
-            .profile-track-list {
-                grid-template-columns: 1fr; /* Одна колонка на маленьких экранах */
+        @@media (max-width: 600px) {
+            .profile-tracks-grid {
+                grid-template-columns: 1fr; /* Одна колонка на узких экранах */
             }
         }
     </style>

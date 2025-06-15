@@ -36,10 +36,25 @@ namespace SoundTradeWebApp.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            // *** НАЧАЛО ИЗМЕНЕННОГО КОДА ***
+            // Используем прямую проекцию (Select) для извлечения только необходимых данных,
+            // чтобы избежать загрузки больших бинарных данных AudioContent треков.
             var user = await _context.Users
-                                 .Include(u => u.Tracks) // Включаем треки для получения списка
-                                 .AsNoTracking()
-                                 .FirstOrDefaultAsync(u => u.Id == userId);
+                                 .AsNoTracking() // Продолжаем использовать AsNoTracking для производительности
+                                 .Where(u => u.Id == userId) // Фильтруем пользователя по ID
+                                 .Select(u => new // Проецируем в анонимный тип
+                                 {
+                                     u.Username,
+                                     u.Email,
+                                     u.UserType,
+                                     // Проекция треков: выбираем только Id и Title
+                                     UploadedTracks = u.Tracks
+                                                       .OrderBy(t => t.Title) // Сортируем треки по названию
+                                                       .Select(t => new ProfileViewModel.TrackInfo(t.Id, t.Title)) // Проецируем в TrackInfo
+                                                       .ToList() // Преобразуем в список
+                                 })
+                                 .FirstOrDefaultAsync(); // Получаем первого (или единственного) пользователя
+            // *** КОНЕЦ ИЗМЕНЕННОГО КОДА ***
 
             if (user == null)
             {
@@ -53,13 +68,7 @@ namespace SoundTradeWebApp.Controllers
                 Username = user.Username,
                 Email = user.Email,
                 UserType = user.UserType,
-                // --- ИЗМЕНЕНО: Заполняем новый список ---
-                UploadedTracks = user.Tracks
-                                     .OrderBy(t => t.Title)
-                                     // Создаем объекты TrackInfo с ID и Title
-                                     .Select(t => new ProfileViewModel.TrackInfo(t.Id, t.Title))
-                                     .ToList()
-                // --- Конец изменения ---
+                UploadedTracks = user.UploadedTracks // Теперь UploadedTracks уже заполнен из проекции
             };
 
             return View(viewModel);
