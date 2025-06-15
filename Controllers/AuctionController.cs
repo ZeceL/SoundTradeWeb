@@ -142,19 +142,20 @@ namespace SoundTradeWebApp.Controllers
                     {
                         TrackId = model.TrackId,
                         OriginalAuthorUserId = userId,
+                        
+    
                         StartingBid = model.StartingBid,
                         BidIncrement = model.BidIncrement,
+                        AuctionDurationInMinutes = model.AuctionDurationInMinutes, // <-- ДОБАВЛЕНО
                         SubmissionTime = DateTime.UtcNow,
                         Status = AuctionStatus.Pending
                     };
-
                     _context.AuctionSubmissions.Add(submission);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(); 
 
-                    _logger.LogInformation("Автор {UserId} подал заявку на аукцион для трека {TrackId}.", userId, model.TrackId);
-                    TempData["SuccessMessage"] = "Ваш трек успешно предложен на аукцион!";
-                    return RedirectToAction(nameof(Index)); // Успех -> Редирект
-                }
+                TempData["SuccessMessage"] = "Ваш трек успешно предложен на аукцион!"; 
+                return RedirectToAction(nameof(Index)); 
+            }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Ошибка при сохранении заявки на аукцион от пользователя {UserId} для трека {TrackId}", userId, model.TrackId);
@@ -199,11 +200,22 @@ namespace SoundTradeWebApp.Controllers
             submissionModel.AvailableTracks = availableTracks;
             submissionModel.AvailableTracks.Insert(0, new SelectListItem { Value = "", Text = "-- Выберите трек --" }); // Убедимся, что Value=""
 
-            submissionModel.AvailableIncrements = new List<SelectListItem> {
-        new() { Value = "", Text = "-- Выберите шаг --" }, // Убедимся, что Value=""
-        new() { Value = "500", Text = "500 руб." },
-        new() { Value = "1000", Text = "1000 руб." },
-        new() { Value = "2000", Text = "2000 руб." } };
+            submissionModel.AvailableIncrements = new List<SelectListItem> 
+            {
+            new() { Value = "", Text = "-- Выберите шаг --" }, // Убедимся, что Value=""
+            new() { Value = "500", Text = "500 руб." },
+            new() { Value = "1000", Text = "1000 руб." },
+            new() { Value = "2000", Text = "2000 руб." } 
+            };
+
+            submissionModel.AvailableDurations = new List<SelectListItem>
+            {
+            new() { Value = "", Text = "-- Выберите длительность --" },
+            new() { Value = "1", Text = "1 минута" },
+            new() { Value = "3", Text = "3 минуты" },
+            new() { Value = "5", Text = "5 минут" },
+            new() { Value = "10", Text = "10 минут" } // Пример опций
+            };
         }
 
         private bool IsValidBidIncrement(int increment)

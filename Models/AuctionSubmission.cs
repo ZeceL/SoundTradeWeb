@@ -30,6 +30,10 @@ namespace SoundTradeWebApp.Models
         public DateTime SubmissionTime { get; set; } = DateTime.UtcNow; // Время подачи заявки
 
         [Required]
+        [Range(1, 60, ErrorMessage = "Длительность аукциона должна быть от 1 до 60 минут.")]
+        public int AuctionDurationInMinutes { get; set; } 
+
+        [Required]
         public AuctionStatus Status { get; set; } = AuctionStatus.Pending; // Статус заявки
 
         // Навигационные свойства (для удобной работы с связанными данными)

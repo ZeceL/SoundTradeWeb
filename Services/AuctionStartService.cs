@@ -89,16 +89,19 @@ namespace SoundTradeWebApp.Services
                                                trackToAuction.Id, trackToAuction.Title);
 
                                         var auctionStartTime = DateTime.UtcNow; // Фиксируем время старта
+
+                                        var auctionDuration = TimeSpan.FromMinutes(selectedSubmission.AuctionDurationInMinutes);
+
                                         var newAuction = new Auction
                                         {
                                             TrackId = trackToAuction.Id,
                                             StartTime = auctionStartTime,
-                                            EndTime = auctionStartTime.Add(_settings.AuctionDuration),
+                                            EndTime = auctionStartTime.Add(auctionDuration), // <-- ИЗМЕНЕНО
                                             StartingBid = selectedSubmission.StartingBid,
                                             CurrentHighestBid = null,
                                             CurrentHighestBidderUserId = null,
                                             BidIncrement = selectedSubmission.BidIncrement,
-                                            Status = AuctionStatus.Active // Сразу Активный
+                                            Status = AuctionStatus.Active
                                         };
                                         selectedSubmission.Status = AuctionStatus.SelectedForAuction;
 

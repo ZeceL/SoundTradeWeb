@@ -225,6 +225,52 @@ namespace SoundTradeWebApp.Controllers
             }
         }
 
+        private void PopulateDropdownLists(EditTrackViewModel model)
+        {
+            // Инициализируем, только если еще не заполнены (на случай повторного вызова)
+            if (!model.AvailableGenres.Any())
+            {
+                model.AvailableGenres = new List<SelectListItem>
+        {
+            new() { Value = "", Text = "-- Выберите жанр --" },
+            new() { Value = "Pop", Text = "Поп" },
+            new() { Value = "Rock", Text = "Рок" },
+            new() { Value = "HipHop", Text = "Хип-хоп" },
+            new() { Value = "Electronic", Text = "Электроника" },
+            new() { Value = "Classical", Text = "Классика" },
+            new() { Value = "Jazz", Text = "Джаз" },
+            new() { Value = "Other", Text = "Другое" }
+        };
+            }
+
+            if (!model.AvailableVocalTypes.Any())
+            {
+                model.AvailableVocalTypes = new List<SelectListItem>
+        {
+            new() { Value = "", Text = "-- Выберите тип вокала --" },
+            new() { Value = "Male", Text = "Мужской" },
+            new() { Value = "Female", Text = "Женский" },
+            new() { Value = "Mixed", Text = "Смешанный" },
+            new() { Value = "Instrumental", Text = "Инструментал" }
+        };
+            }
+
+            if (!model.AvailableMoods.Any())
+            {
+                model.AvailableMoods = new List<SelectListItem>
+        {
+            new() { Value = "", Text = "-- Выберите настроение --" },
+            new() { Value = "Happy", Text = "Веселое" },
+            new() { Value = "Sad", Text = "Грустное" },
+            new() { Value = "Energetic", Text = "Энергичное" },
+            new() { Value = "Calm", Text = "Спокойное" },
+            new() { Value = "Romantic", Text = "Романтичное" },
+            new() { Value = "Epic", Text = "Эпичное" },
+            new() { Value = "Other", Text = "Другое" }
+        };
+            }
+        }
+
         // GET: /AuthorPanel/Delete/{id} - Показывает страницу подтверждения удаления
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
@@ -316,7 +362,7 @@ namespace SoundTradeWebApp.Controllers
             }
 
             // Создаем ViewModel и заполняем ее данными из трека
-            var viewModel = new UploadTrackViewModel // Используем ту же ViewModel, что и для загрузки
+            var viewModel = new EditTrackViewModel// Используем ту же ViewModel, что и для загрузки
             {
                 Id = track.Id, // Добавляем ID для сохранения при редактировании
                 Title = track.Title,
@@ -339,34 +385,34 @@ namespace SoundTradeWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(200 * 1024 * 1024)] // Пример лимита, убедитесь, что соответствует вашим требованиям
-        public async Task<IActionResult> Edit(UploadTrackViewModel model) // Принимаем ViewModel
+        public async Task<IActionResult> Edit(EditTrackViewModel model) // Принимаем ViewModel
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
             {
                 ModelState.AddModelError("", "Ошибка идентификации пользователя.");
-                PopulateDropdownLists(model);
+                PopulateDropdownLists(model); // Вызовет перегрузку для EditTrackViewModel
                 return View(model);
             }
 
-            // Находим существующий трек по ID и проверяем принадлежность
+            // Находим существующий трек по ID и проверяем принадлежность 
             var existingTrack = await _context.Tracks
                 .FirstOrDefaultAsync(t => t.Id == model.Id && t.AuthorUserId == userId);
-
             if (existingTrack == null)
             {
-                return NotFound(); // Или другая обработка, если трек не найден (удален другим пользователем?)
+                return NotFound();
             }
 
-            // Валидация файла ТОЛЬКО если пользователь загрузил новый
+
+            // Валидация файла ТОЛЬКО если пользователь загрузил новый 
             if (model.AudioFile != null && model.AudioFile.Length > 0)
             {
                 // ... добавьте здесь те же проверки файла, что и в методе Upload ...
-                if (model.AudioFile.Length > 20 * 1048576) // Пример лимита 20MB
+                if (model.AudioFile.Length > 20 * 1048576) // Пример лимита 20MB 
                 {
                     ModelState.AddModelError(nameof(model.AudioFile), "Новый файл превышает допустимый размер (20MB).");
                 }
-                // ... другие проверки типа файла и т.д. ...
+                // ... другие проверки типа файла и т.д.
             }
 
 
@@ -380,9 +426,9 @@ namespace SoundTradeWebApp.Controllers
                     existingTrack.VocalType = model.VocalType;
                     existingTrack.Mood = model.Mood;
                     existingTrack.Lyrics = model.Lyrics;
-                    // ArtistName не обновляется, так как зависит от пользователя
+                    // ArtistName не обновляется, так как зависит от пользователя 
 
-                    // Если загружен новый аудиофайл, обновляем его
+                    // Если загружен новый аудиофайл, обновляем его 
                     if (model.AudioFile != null && model.AudioFile.Length > 0)
                     {
                         using (var memoryStream = new MemoryStream())
@@ -390,15 +436,12 @@ namespace SoundTradeWebApp.Controllers
                             await model.AudioFile.CopyToAsync(memoryStream);
                             existingTrack.AudioFileContent = memoryStream.ToArray();
                             existingTrack.AudioContentType = model.AudioFile.ContentType;
-                            // Возможно, стоит обновить дату загрузки, если файл новый?
-                            // existingTrack.UploadDate = DateTime.UtcNow;
                         }
                     }
                     // Если файл не загружен, AudioFileContent и AudioContentType остаются прежними
 
-                    _context.Update(existingTrack); // Помечаем трек как измененный
+                    _context.Update(existingTrack);
                     await _context.SaveChangesAsync();
-
                     _logger.LogInformation("Трек '{TrackTitle}' (ID: {TrackId}) обновлен автором {AuthorId}.", existingTrack.Title, existingTrack.Id, userId);
                     TempData["SuccessMessage"] = $"Трек '{existingTrack.Title}' успешно обновлен!";
                     return RedirectToAction(nameof(Index));
@@ -410,7 +453,7 @@ namespace SoundTradeWebApp.Controllers
                 }
             }
             // Если модель невалидна или произошла ошибка, возвращаем форму с ошибками
-            PopulateDropdownLists(model); // Перезаполняем списки перед возвратом
+            PopulateDropdownLists(model); // Перезаполняем списки перед возвратом 
             return View(model);
         }
     }

@@ -23,7 +23,13 @@ namespace SoundTradeWebApp.Models.ViewModels
         [Display(Name = "Шаг ставки (руб.)")]
         public int BidIncrement { get; set; }
 
+        [Required(ErrorMessage = "Необходимо выбрать длительность аукциона.")]
+        [Display(Name = "Длительность аукциона (в минутах)")]
+        [Range(1, int.MaxValue, ErrorMessage = "Необходимо выбрать длительность аукциона.")]
+        public int AuctionDurationInMinutes { get; set; }
+
         // Списки для dropdowns
+        public List<SelectListItem> AvailableDurations { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> AvailableTracks { get; set; } = new();
         public List<SelectListItem> AvailableIncrements { get; set; } = new();
     }

@@ -115,7 +115,9 @@ main {
 	padding: 20px;
 	background-color: #1a1a1a; /* Фон для основной части */
 }
-
+.catalog-page-content .song-section {
+	margin-left: 130px;
+}
 /* Стили для секций песен на главной */
 .song-section {
 	margin-bottom: 30px;

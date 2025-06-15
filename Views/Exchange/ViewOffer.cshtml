@@ -30,14 +30,14 @@
         <p style="color:#aaa; margin-bottom:20px;">Дата предложения: @Model.OfferDate.ToString("dd.MM.yyyy HH:mm")</p>
 
         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin-bottom:25px;">
-            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px;">
+            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px; text-align: center;">
                 <h5 style="color:#00c292; margin-bottom:10px;">Предлагаемый трек (от @Model.InitiatorUsername):</h5>
                 <p><strong>Название:</strong> @Model.OfferedTrackTitle</p>
                 <p><strong>Исполнитель:</strong> @Model.OfferedTrackArtistName</p>
                 @if (!string.IsNullOrEmpty(Model.OfferedTrackAudioUrl))
                 {
                     <div class="song-list-detailed">
-                        <div class="song-item-actions">
+                        <div class="song-item-actionsOffer">
                             <button class="play-song-btn"
                                     data-song-url="@Model.OfferedTrackAudioUrl"
                                     data-title="@Model.OfferedTrackTitle"
@@ -50,14 +50,14 @@
                 }
             </div>
 
-            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px;">
+            <div class="track-exchange-card" style="background-color: #333; padding:15px; border-radius:5px; flex-basis: 45%; min-width: 280px; text-align: center;">
                 <h5 style="color:#f39c12; margin-bottom:10px;">Ваш трек (запрашиваемый):</h5>
                 <p><strong>Название:</strong> @Model.RequestedTrackTitle</p>
                 <p><strong>Исполнитель:</strong> @Model.RequestedTrackArtistName</p>
                 @if (!string.IsNullOrEmpty(Model.RequestedTrackAudioUrl))
                 {
                     <div class="song-list-detailed">
-                        <div class="song-item-actions">
+                        <div class="song-item-actionsOffer">
                             <button class="play-song-btn"
                                     data-song-url="@Model.OfferedTrackAudioUrl"
                                     data-title="@Model.OfferedTrackTitle"
@@ -165,10 +165,10 @@
                 }
 
                 /* Контейнер для кнопок */
-                .song-list-detailed .song-item .song-item-actions {
+                .song-list-detailed .song-item .song-item-actionsOffer {
                     margin-top: 15px; /* Отступ сверху для кнопок */
-                    display: flex;
-                    justify-content: center;
+                    display: flex; /* Важно для использования justify-content */
+                    justify-content: center; /* Центрирует элементы по горизонтали */
                     align-items: center;
                     gap: 10px; /* Расстояние между кнопками */
                     flex-wrap: wrap;
